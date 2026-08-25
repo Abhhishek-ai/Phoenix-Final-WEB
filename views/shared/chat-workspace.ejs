@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Project Discussion | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="dashboard-body">
+  <% if (typeof user !== 'undefined' && user && user.role === 'ADMIN') { %>
+    <%- include('../partials/admin-navbar') %>
+    <div class="dashboard-layout">
+      <%- include('../partials/admin-sidebar') %>
+      <main class="dashboard-content">
+  <% } else { %>
+    <%- include('../partials/freelancer-navbar') %>
+    <div class="dashboard-layout">
+      <%- include('../partials/freelancer-sidebar') %>
+      <main class="dashboard-content">
+  <% } %>
+
+      <div class="dashboard-container" style="max-width: 900px; margin: 0 auto;">
+        <!-- Top Navigation -->
+        <div class="details-top-bar">
+          <a href="<%= user && user.role === 'ADMIN' ? '/admin/assignments/' + assignment._id : '/freelancer/assignments/' + assignment._id %>" class="btn btn-outline btn-sm">
+            &larr; Back to Workspace
+          </a>
+          <span class="status-badge status-badge-active">
+            💬 Live Project Channel
+          </span>
+        </div>
+
+        <!-- Chat Card Container -->
+        <div class="chat-workspace-card">
+          <!-- Chat Header -->
+          <div class="chat-header">
+            <div class="chat-partner-info">
+              <span class="table-avatar"><%= chatPartner && chatPartner.name ? chatPartner.name.charAt(0).toUpperCase() : 'U' %></span>
+              <div>
+                <h3 class="chat-partner-name"><%= chatPartner ? chatPartner.name : 'Project Coordinator' %></h3>
+                <span class="chat-project-title">Project: <%= assignment.projectId ? assignment.projectId.title : 'Assignment' %></span>
+              </div>
+            </div>
+            <div class="chat-channel-badge">
+              <span class="status-dot"></span> Socket.io Connected
+            </div>
+          </div>
+
+          <!-- Messages Thread -->
+          <div class="chat-messages-container" id="chatMessagesContainer">
+            <% if (typeof messages !== 'undefined' && messages.length > 0) { %>
+              <% messages.forEach(function(msg) { %>
+                <% const isMe = msg.senderId && msg.senderId._id.toString() === user._id.toString(); %>
+                <div class="chat-bubble-wrapper <%= isMe ? 'bubble-outgoing' : 'bubble-incoming' %>">
+                  <div class="chat-bubble">
+                    <span class="bubble-sender"><%= isMe ? 'You' : (msg.senderId ? msg.senderId.name : 'User') %></span>
+                    <p class="bubble-text"><%= msg.message %></p>
+                    <span class="bubble-time"><%= new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></span>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="empty-state" id="emptyChatState" style="padding: 3rem 1rem;">
+                <span class="empty-state-icon">💬</span>
+                <h3>Start the Project Discussion</h3>
+                <p>Send a message below to coordinate milestones, ask technical questions, or share project updates.</p>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Message Input Form -->
+          <form id="chatForm" class="chat-input-form" onsubmit="return handleSendMessage(event)">
+            <input 
+              type="text" 
+              id="messageInput" 
+              class="chat-input-control" 
+              placeholder="Type your message here..." 
+              autocomplete="off" 
+              required
+            >
+            <button type="submit" class="btn btn-primary chat-send-btn" id="sendBtn">
+              Send 🚀
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const currentUserId = "<%= user ? user._id : '' %>";
+    const assignmentId = "<%= assignment._id %>";
+    const socket = io();
+
+    // Join room for this assignment
+    socket.emit('join_assignment', 'assignment_' + assignmentId);
+
+    const chatContainer = document.getElementById('chatMessagesContainer');
+    const messageInput = document.getElementById('messageInput');
+    const emptyChatState = document.getElementById('emptyChatState');
+
+    // Scroll to bottom
+    function scrollToBottom() {
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+    scrollToBottom();
+
+    // Listen for incoming messages
+    socket.on('new_message', (msg) => {
+      if (emptyChatState) emptyChatState.style.display = 'none';
+
+      const isMe = msg.senderId && (msg.senderId._id === currentUserId || msg.senderId === currentUserId);
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble-wrapper ${isMe ? 'bubble-outgoing' : 'bubble-incoming'}`;
+
+      const timeStr = new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const senderName = isMe ? 'You' : (msg.senderId && msg.senderId.name ? msg.senderId.name : 'User');
+
+      bubble.innerHTML = `
+        <div class="chat-bubble">
+          <span class="bubble-sender">${senderName}</span>
+          <p class="bubble-text">${escapeHtml(msg.message)}</p>
+          <span class="bubble-time">${timeStr}</span>
+        </div>
+      `;
+
+      chatContainer.appendChild(bubble);
+      scrollToBottom();
+    });
+
+    async function handleSendMessage(event) {
+      event.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      messageInput.value = '';
+
+      try {
+        const response = await fetch(`/api/chat/${assignmentId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const result = await response.json();
+        if (!result.success) {
+          alert('Failed to send message: ' + (result.error || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Chat send error:', err);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Admin Dashboard | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Platform Overview</h1>
+            <p class="page-main-subtitle">Real-time freelancer statistics and registration approvals for MBM University</p>
+          </div>
+          <div class="page-header-actions">
+            <a href="/admin/freelancers?status=PENDING" class="btn btn-primary btn-sm">
+              Review Pending (<%= stats.pending %>)
+            </a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Realtime Statistics Cards Grid -->
+        <div class="stats-grid">
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Total Freelancers</span>
+              <span class="stat-icon-badge total-badge">👥</span>
+            </div>
+            <div class="stat-card-value"><%= stats.total %></div>
+            <p class="stat-card-meta">All registered students</p>
+          </div>
+
+          <div class="admin-stat-card <%= stats.pending > 0 ? 'highlight-pending' : '' %>">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Pending Approvals</span>
+              <span class="stat-icon-badge pending-badge">⏳</span>
+            </div>
+            <div class="stat-card-value"><%= stats.pending %></div>
+            <p class="stat-card-meta">
+              <a href="/admin/freelancers?status=PENDING" class="stat-card-link">Review pending &rarr;</a>
+            </p>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Active Freelancers</span>
+              <span class="stat-icon-badge active-badge">✓</span>
+            </div>
+            <div class="stat-card-value"><%= stats.active %></div>
+            <p class="stat-card-meta">Verified & project-ready</p>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Suspended</span>
+              <span class="stat-icon-badge suspended-badge">⏸️</span>
+            </div>
+            <div class="stat-card-value"><%= stats.suspended %></div>
+            <p class="stat-card-meta">Accounts on hold</p>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="stat-card-header">
+              <span class="stat-card-title">Rejected</span>
+              <span class="stat-icon-badge rejected-badge">❌</span>
+            </div>
+            <div class="stat-card-value"><%= stats.rejected %></div>
+            <p class="stat-card-meta">Unapproved submissions</p>
+          </div>
+        </div>
+
+        <!-- Recent Registrations Section -->
+        <div class="admin-section-card">
+          <div class="section-card-header">
+            <div>
+              <h2 class="section-card-title">Recent Freelancer Registrations</h2>
+              <p class="section-card-subtitle">Newest student submissions requiring coordinator action</p>
+            </div>
+            <a href="/admin/freelancers" class="btn btn-secondary btn-sm">View All Freelancers</a>
+          </div>
+
+          <% if (typeof recentFreelancers !== 'undefined' && recentFreelancers.length > 0) { %>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Branch</th>
+                    <th>Year</th>
+                    <th>Registered</th>
+                    <th>Status</th>
+                    <th class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% recentFreelancers.forEach(function(f) { %>
+                    <tr>
+                      <td>
+                        <div class="student-name-cell">
+                          <span class="table-avatar"><%= f.name ? f.name.charAt(0).toUpperCase() : 'S' %></span>
+                          <div>
+                            <span class="student-name"><%= f.name %></span>
+                            <span class="student-enrollment">
+                              <%= f.profile && f.profile.enrollmentNumber ? f.profile.enrollmentNumber : 'N/A' %>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="mono-text"><%= f.email %></span></td>
+                      <td><%= f.profile && f.profile.branch ? f.profile.branch : 'General' %></td>
+                      <td>
+                        <% if (f.profile && f.profile.year) { %>
+                          <%= f.profile.year %><% if (f.profile.year === 1) { %>st<% } else if (f.profile.year === 2) { %>nd<% } else if (f.profile.year === 3) { %>rd<% } else { %>th<% } %> Year
+                        <% } else { %>
+                          -
+                        <% } %>
+                      </td>
+                      <td><%= new Date(f.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                      <td>
+                        <span class="status-badge status-badge-<%= f.status ? f.status.toLowerCase() : 'pending' %>">
+                          <%= f.status %>
+                        </span>
+                      </td>
+                      <td class="text-right">
+                        <a href="/admin/freelancers/<%= f._id %>" class="btn btn-secondary btn-xs">
+                          View Details &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">📭</span>
+              <h3>No Freelancers Registered Yet</h3>
+              <p>When students register for PHOENIX, their applications will appear here for review.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

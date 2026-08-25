@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'My Bids & Proposals | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">My Proposals & Bids</h1>
+            <p class="page-main-subtitle">Track the review status and acceptance of your submitted bids</p>
+          </div>
+          <div>
+            <a href="/freelancer/projects" class="btn btn-primary btn-sm">+ Browse More Projects</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Filter Tabs Toolbar -->
+        <div class="toolbar-card">
+          <div class="filter-tabs">
+            <a href="/freelancer/bids" class="filter-tab <%= typeof currentStatus !== 'undefined' && currentStatus === 'ALL' ? 'active' : '' %>">
+              All Bids
+            </a>
+            <a href="/freelancer/bids?status=PENDING" class="filter-tab tab-pending <%= typeof currentStatus !== 'undefined' && currentStatus === 'PENDING' ? 'active' : '' %>">
+              Pending
+            </a>
+            <a href="/freelancer/bids?status=ACCEPTED" class="filter-tab tab-active <%= typeof currentStatus !== 'undefined' && currentStatus === 'ACCEPTED' ? 'active' : '' %>">
+              Accepted
+            </a>
+            <a href="/freelancer/bids?status=REJECTED" class="filter-tab tab-suspended <%= typeof currentStatus !== 'undefined' && currentStatus === 'REJECTED' ? 'active' : '' %>">
+              Rejected
+            </a>
+          </div>
+        </div>
+
+        <!-- Bids Table -->
+        <div class="admin-section-card">
+          <% if (typeof bids !== 'undefined' && bids.length > 0) { %>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Bid Price</th>
+                    <th>Timeline</th>
+                    <th>Submitted On</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% bids.forEach(function(bid) { %>
+                    <tr>
+                      <td>
+                        <strong>
+                          <a href="/freelancer/bids/<%= bid._id %>" class="table-project-link">
+                            <%= bid.projectId ? bid.projectId.title : 'Project' %>
+                          </a>
+                        </strong>
+                      </td>
+                      <td>
+                        <span class="mono-text" style="color: var(--accent-emerald); font-weight: 700;">
+                          ₹<%= bid.amount ? bid.amount.toLocaleString('en-IN') : '0' %>
+                        </span>
+                      </td>
+                      <td>⏱️ <%= bid.estimatedDays %> Days</td>
+                      <td><%= new Date(bid.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                      <td>
+                        <span class="status-badge status-badge-<%= bid.status ? bid.status.toLowerCase() : 'pending' %>">
+                          <%= bid.status %>
+                        </span>
+                      </td>
+                      <td class="text-right">
+                        <a href="/freelancer/bids/<%= bid._id %>" class="btn btn-secondary btn-xs">
+                          View Proposal &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">🏷️</span>
+              <h3>No Proposals Found</h3>
+              <p>You have not submitted any proposals under this status filter.</p>
+              <div style="margin-top: 1rem;">
+                <a href="/freelancer/projects" class="btn btn-primary btn-sm">Explore Open Projects</a>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

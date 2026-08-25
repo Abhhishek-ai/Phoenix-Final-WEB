@@ -1,0 +1,98 @@
+<!-- SECTION 06 — WELCOME & GREETING VIDEO SHOWCASE -->
+<section class="ph-section ph-video-section" id="welcome-video">
+  <!-- Multi-color Ambient Light Spheres -->
+  <div class="ph-video-ambient-sphere sphere-cyan"></div>
+  <div class="ph-video-ambient-sphere sphere-violet"></div>
+  <div class="ph-video-ambient-sphere sphere-amber"></div>
+
+  <div class="ph-container">
+    <!-- Welcome & Greeting Header -->
+    <div class="ph-section-header">
+      <div class="ph-welcome-badge">
+        <span class="ph-welcome-wave">👋</span>
+        <span class="ph-welcome-badge-text">WELCOME TO PHOENIX</span>
+      </div>
+      <h2 class="ph-section-title">
+        STEP INSIDE THE <span class="ph-gradient-text ph-gradient-rainbow">PHOENIX NETWORK.</span>
+      </h2>
+      <p class="ph-section-sub">
+        Watch our official campus orientation film. Discover how student developers, designers, and creators collaborate on live real-world projects, receive mentorship, and grow while in college.
+      </p>
+    </div>
+
+    <!-- Vibrant Colorful Frame Wrapper -->
+    <div class="ph-video-colorful-wrapper" data-reveal="fade-up">
+      <!-- Animated Gradient Border Frame -->
+      <div class="ph-colorful-border-gradient">
+        <div class="ph-video-frame" id="phVideoPosterWrap">
+          <img src="/images/video/poster.jpg" alt="Phoenix Official Orientation Video Poster" class="ph-video-poster" loading="lazy">
+          <div class="ph-video-overlay-tint"></div>
+          <div class="ph-video-scanline"></div>
+
+          <!-- Top Greeting Status Bar -->
+          <div class="ph-video-top-bar">
+            <div class="ph-video-rec">
+              <span class="ph-rec-dot"></span>
+              <span class="ph-top-status-text">PHOENIX // WELCOME &amp; ORIENTATION</span>
+            </div>
+            <div class="ph-video-badges-row">
+              <span class="ph-vid-pill pill-violet">4K ULTRA HD</span>
+              <span class="ph-vid-pill pill-cyan">03:45</span>
+            </div>
+          </div>
+
+          <!-- Central Colorful Play Button -->
+          <button class="ph-play-btn ph-play-btn-colorful" id="phPlayBtn" aria-label="Play Welcome Video">
+            <div class="ph-play-halo-rainbow"></div>
+            <svg class="ph-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            <span class="ph-play-label">WATCH FILM</span>
+          </button>
+
+          <!-- Bottom Welcome Highlights -->
+          <div class="ph-video-bottom-bar">
+            <div class="ph-bottom-greeting">
+              <span class="ph-greeting-dot">✨</span>
+              <span class="ph-greeting-text">“Your skills deserve more than a classroom. Welcome to Phoenix.”</span>
+            </div>
+            <div class="ph-video-campus-tag">
+              <span>Phoenix Campus</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Colorful Accent Cards -->
+      <div class="ph-float-card card-left">
+        <div class="ph-fcard-icon">🚀</div>
+        <div class="ph-fcard-text">
+          <strong>100% Student-Driven</strong>
+          <span>Built by Phoenix Creators</span>
+        </div>
+      </div>
+
+      <div class="ph-float-card card-right">
+        <div class="ph-fcard-icon">💡</div>
+        <div class="ph-fcard-text">
+          <strong>8+ Specialized Domains</strong>
+          <span>Web, AI, UI/UX &amp; Media</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Modal Overlay -->
+  <div class="ph-video-modal" id="phVideoModal" aria-hidden="true" role="dialog" aria-label="Welcome Video Player Modal">
+    <div class="ph-modal-backdrop" id="phModalBackdrop"></div>
+    <div class="ph-modal-content">
+      <button class="ph-modal-close" id="phModalClose" aria-label="Close video player">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="ph-modal-video-wrapper">
+        <video id="phMainVideo" class="ph-modal-video" controls poster="/images/video/poster.jpg" preload="none">
+          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+</section>

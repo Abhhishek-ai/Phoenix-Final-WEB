@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'My Portfolio | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">My Portfolio Showcase</h1>
+            <p class="page-main-subtitle">Showcase your campus innovations, past projects, codebases, and design works</p>
+          </div>
+          <div class="page-header-actions">
+            <a href="/portfolio" target="_blank" class="btn btn-outline btn-sm">View Public Gallery ↗</a>
+            <a href="/freelancer/portfolio/create" class="btn btn-primary btn-sm">+ Add Project</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Portfolio Projects Grid -->
+        <% if (typeof portfolioItems !== 'undefined' && portfolioItems.length > 0) { %>
+          <div class="portfolio-showcase-grid">
+            <% portfolioItems.forEach(function(item) { %>
+              <div class="portfolio-item-card">
+                <!-- Media Screenshot Preview -->
+                <div class="portfolio-card-media">
+                  <% if (item.media && item.media.length > 0 && item.media[0].url) { %>
+                    <img src="<%= item.media[0].url %>" alt="<%= item.title %>" class="portfolio-img">
+                  <% } else { %>
+                    <div class="portfolio-placeholder-img">
+                      <span>🎨 Project Media</span>
+                    </div>
+                  <% } %>
+                  <span class="portfolio-status-pill status-badge-<%= item.status === 'APPROVED' ? 'active' : (item.status === 'REJECTED' ? 'suspended' : 'pending') %>">
+                    <%= item.status === 'PENDING_REVIEW' ? 'Under Review' : item.status %>
+                  </span>
+                </div>
+
+                <div class="portfolio-card-body">
+                  <span class="domain-tag-sm" style="font-size: 0.6875rem;"><%= item.category ? item.category.replace('_', ' ') : 'General' %></span>
+                  <h3 class="portfolio-card-title"><%= item.title %></h3>
+                  <p class="portfolio-card-desc"><%= item.description %></p>
+
+                  <% if (item.skills && item.skills.length > 0) { %>
+                    <div class="skills-tag-group" style="margin: 0.75rem 0;">
+                      <% item.skills.forEach(function(s) { %>
+                        <span class="skill-tag skill-tag-sm">
+                          <%= typeof s === 'object' && s.name ? s.name : s %>
+                        </span>
+                      <% }); %>
+                    </div>
+                  <% } %>
+
+                  <div class="portfolio-links-row">
+                    <% if (item.projectLink) { %>
+                      <a href="<%= item.projectLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                        🌐 Live Demo ↗
+                      </a>
+                    <% } %>
+                    <% if (item.githubLink) { %>
+                      <a href="<%= item.githubLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                        💻 GitHub ↗
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="portfolio-card-footer">
+                  <span class="portfolio-date"><%= new Date(item.createdAt).toLocaleDateString('en-IN') %></span>
+                  <form action="/freelancer/portfolio/<%= item._id %>/delete" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('Delete this portfolio project?')">
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="admin-section-card">
+            <div class="empty-state">
+              <span class="empty-state-icon">🎨</span>
+              <h3>No Portfolio Projects Added Yet</h3>
+              <p>Upload screenshots, GitHub links, and live demos of your past coursework or freelance builds to attract clients and coordinators.</p>
+              <div style="margin-top: 1.25rem;">
+                <a href="/freelancer/portfolio/create" class="btn btn-primary btn-sm">+ Add Your First Project</a>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

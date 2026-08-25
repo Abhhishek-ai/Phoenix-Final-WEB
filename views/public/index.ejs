@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title><%= typeof title !== 'undefined' ? title : 'PHOENIX — Student Freelancing Club' %></title>
+  <meta name="title" content="<%= typeof title !== 'undefined' ? title : 'PHOENIX — Student Freelancing Club' %>">
+  <meta name="description" content="<%= typeof metaDescription !== 'undefined' ? metaDescription : 'Phoenix is the premier freelancing community where students turn their skills into real projects, experience and opportunities.' %>">
+  <meta name="keywords" content="PHOENIX, Freelancing Club, Student Developers, Engineering, Web Development, AI, ML, UI UX, App Development">
+  <meta name="author" content="PHOENIX Team">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://localhost:3000/">
+  <meta property="og:title" content="PHOENIX — Student Freelancing Club">
+  <meta property="og:description" content="Phoenix is the premier freelancing community where students turn their skills into real projects, experience and opportunities.">
+  <meta property="og:image" content="/images/video/poster.jpg">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="PHOENIX — Student Freelancing Club">
+  <meta property="twitter:description" content="Phoenix is the premier freelancing community where students turn their skills into real projects, experience and opportunities.">
+  <meta property="twitter:image" content="/images/video/poster.jpg">
+
+  <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Master Landing Page Stylesheet -->
+  <link rel="stylesheet" href="/css/landing.css">
+
+  <!-- Immediate Theme Initialization Script (Prevents FOUT) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('phoenix_theme');
+      if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Floating Glassmorphic Navbar -->
+  <%- include('../partials/landing/navbar') %>
+
+  <!-- Flash Notification Container -->
+  <% if (typeof messages !== 'undefined' && (messages.success_msg || messages.error_msg || messages.info_msg)) { %>
+    <div class="ph-flash-wrapper">
+      <%- include('../partials/flash') %>
+    </div>
+  <% } %>
+
+  <main id="mainContent">
+    <!-- SECTION 01 — Full Viewport Cinematic Hero with 3D Globe -->
+    <%- include('../partials/landing/hero') %>
+
+    <!-- SECTION 02 — About Phoenix & Vision / Mission -->
+    <%- include('../partials/landing/about') %>
+
+    <!-- SECTION 03 — Phoenix Origin Story & Timeline -->
+    <%- include('../partials/landing/timeline') %>
+
+    <!-- SECTION 04 — Meet The Team -->
+    <%- include('../partials/landing/team') %>
+
+    <!-- SECTION 05 — What We Offer (Stacked Opening Cards) -->
+    <%- include('../partials/landing/skills') %>
+
+    <!-- SECTION 06 — Cinematic Video Showcase -->
+    <%- include('../partials/landing/video') %>
+
+    <!-- SECTION 07 — How Phoenix Works (7-Step Roadmap) -->
+    <%- include('../partials/landing/how-it-works') %>
+
+    <!-- SECTION 08 — Community & Scale Metrics -->
+    <%- include('../partials/landing/community') %>
+
+    <!-- SECTION 09 — Live Network Activity Feed -->
+    <%- include('../partials/landing/live-network') %>
+
+    <!-- SECTION 10 — Final CTA -->
+    <%- include('../partials/landing/cta') %>
+  </main>
+
+  <!-- Minimal Dark Footer -->
+  <%- include('../partials/landing/footer') %>
+
+  <!-- External Animation & 3D Libraries (CDN with graceful fallback) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+
+  <!-- PHOENIX 3D Globe & Landing Page Interactions -->
+  <script src="/js/globe.js"></script>
+  <script src="/js/landing.js"></script>
+</body>
+</html>

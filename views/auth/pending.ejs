@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Account Pending Review | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <div class="flash-container">
+    <%- include('../partials/flash') %>
+  </div>
+
+  <main class="auth-main">
+    <div class="auth-card status-card">
+      <div class="status-icon-wrapper status-pending">
+        <span>⏳</span>
+      </div>
+
+      <div class="auth-header">
+        <span class="status-pill status-pill-pending">Status: Pending Review</span>
+        <h1 class="auth-title">Registration Submitted</h1>
+        <p class="auth-subtitle">
+          Your PHOENIX student freelancer registration has been received successfully.
+        </p>
+      </div>
+
+      <div class="status-content-box">
+        <p class="status-text">
+          To maintain quality and university standards, an administrator or club coordinator will review your academic credentials and student profile before granting access to client projects and freelancing tracks.
+        </p>
+        <div class="status-timeline">
+          <div class="timeline-step done">
+            <span class="step-circle">✓</span>
+            <span class="step-text">Profile Submitted</span>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step active">
+            <span class="step-circle">2</span>
+            <span class="step-text">Coordinator Verification</span>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step">
+            <span class="step-circle">3</span>
+            <span class="step-text">Freelancer Dashboard Access</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-actions">
+        <a href="/login" class="btn btn-primary btn-lg">Go to Login</a>
+        <a href="/" class="btn btn-secondary btn-lg">Back to Homepage</a>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

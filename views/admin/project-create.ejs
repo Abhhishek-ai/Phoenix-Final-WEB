@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Create Project | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Create Project Listing</h1>
+            <p class="page-main-subtitle">Publish a new engineering or freelancing project for MBM students</p>
+          </div>
+          <div>
+            <a href="/admin/projects" class="btn btn-secondary btn-sm">&larr; Back to Projects</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Form Card -->
+        <div class="admin-section-card form-card-max">
+          <% if (typeof errors !== 'undefined' && errors.general) { %>
+            <div class="alert alert-error">
+              <div class="alert-content">
+                <span class="alert-icon">⚠</span>
+                <span><%= errors.general %></span>
+              </div>
+            </div>
+          <% } %>
+
+          <form action="/admin/projects" method="POST" class="project-form" novalidate>
+            <!-- Project Title -->
+            <div class="form-group">
+              <label for="title" class="form-label">Project Title <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.title ? 'is-invalid' : '' %>" 
+                placeholder="e.g. MBM University Campus Navigation Web App" 
+                value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : '' %>" 
+                required
+              >
+              <% if (typeof errors !== 'undefined' && errors.title) { %>
+                <span class="form-error"><%= errors.title %></span>
+              <% } %>
+            </div>
+
+            <!-- Domain Category -->
+            <div class="form-group">
+              <label for="category" class="form-label">Domain Track / Category <span class="required">*</span></label>
+              <select 
+                id="category" 
+                name="category" 
+                class="form-control form-select <%= typeof errors !== 'undefined' && errors.category ? 'is-invalid' : '' %>" 
+                required
+              >
+                <option value="">Select Domain Category</option>
+                <% 
+                  const selectedCat = typeof formData !== 'undefined' && formData.category ? formData.category : '';
+                  categories.forEach(function(cat) { 
+                %>
+                  <option value="<%= cat %>" <%= selectedCat === cat ? 'selected' : '' %>>
+                    <%= cat.replace('_', ' ') %>
+                  </option>
+                <% }); %>
+              </select>
+              <% if (typeof errors !== 'undefined' && errors.category) { %>
+                <span class="form-error"><%= errors.category %></span>
+              <% } %>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label for="description" class="form-label">Full Project Description & Scope <span class="required">*</span></label>
+              <textarea 
+                id="description" 
+                name="description" 
+                rows="6" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.description ? 'is-invalid' : '' %>" 
+                placeholder="Describe project deliverables, tech requirements, milestones, and client objectives..." 
+                required
+              ><%= typeof formData !== 'undefined' && formData.description ? formData.description : '' %></textarea>
+              <% if (typeof errors !== 'undefined' && errors.description) { %>
+                <span class="form-error"><%= errors.description %></span>
+              <% } %>
+            </div>
+
+            <!-- Budget Range -->
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="minBudget" class="form-label">Minimum Budget (INR ₹) <span class="required">*</span></label>
+                <input 
+                  type="number" 
+                  id="minBudget" 
+                  name="minBudget" 
+                  class="form-control <%= typeof errors !== 'undefined' && errors.minBudget ? 'is-invalid' : '' %>" 
+                  placeholder="e.g. 5000" 
+                  value="<%= typeof formData !== 'undefined' && formData.minBudget ? formData.minBudget : '' %>" 
+                  min="0"
+                  required
+                >
+                <% if (typeof errors !== 'undefined' && errors.minBudget) { %>
+                  <span class="form-error"><%= errors.minBudget %></span>
+                <% } %>
+              </div>
+
+              <div class="form-group">
+                <label for="maxBudget" class="form-label">Maximum Budget (INR ₹) <span class="required">*</span></label>
+                <input 
+                  type="number" 
+                  id="maxBudget" 
+                  name="maxBudget" 
+                  class="form-control <%= typeof errors !== 'undefined' && errors.maxBudget ? 'is-invalid' : '' %>" 
+                  placeholder="e.g. 15000" 
+                  value="<%= typeof formData !== 'undefined' && formData.maxBudget ? formData.maxBudget : '' %>" 
+                  min="0"
+                  required
+                >
+                <% if (typeof errors !== 'undefined' && errors.maxBudget) { %>
+                  <span class="form-error"><%= errors.maxBudget %></span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Deadline -->
+            <div class="form-group">
+              <label for="deadline" class="form-label">Submission Deadline <span class="required">*</span></label>
+              <% 
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const minDateStr = tomorrow.toISOString().split('T')[0];
+              %>
+              <input 
+                type="date" 
+                id="deadline" 
+                name="deadline" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.deadline ? 'is-invalid' : '' %>" 
+                min="<%= minDateStr %>"
+                value="<%= typeof formData !== 'undefined' && formData.deadline ? formData.deadline : '' %>" 
+                required
+              >
+              <% if (typeof errors !== 'undefined' && errors.deadline) { %>
+                <span class="form-error"><%= errors.deadline %></span>
+              <% } %>
+            </div>
+
+            <!-- Required Skills Checkboxes (from MongoDB) -->
+            <div class="form-group">
+              <label class="form-label">Required Skills & Technologies (Select all that apply)</label>
+              <div class="skills-checkbox-grid">
+                <% 
+                  const selectedSkillsList = typeof formData !== 'undefined' && formData.requiredSkills ? formData.requiredSkills.map(String) : [];
+                  skills.forEach(function(skill) { 
+                %>
+                  <label class="skill-checkbox-item">
+                    <input 
+                      type="checkbox" 
+                      name="requiredSkills" 
+                      value="<%= skill._id %>"
+                      <%= selectedSkillsList.includes(skill._id.toString()) ? 'checked' : '' %>
+                    >
+                    <span class="skill-checkbox-label"><%= skill.name %></span>
+                  </label>
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary btn-lg">
+                🚀 Publish Project to Marketplace
+              </button>
+              <a href="/admin/projects" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

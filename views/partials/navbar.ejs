@@ -1,0 +1,61 @@
+<header class="navbar-header">
+  <nav class="navbar-container">
+    <a href="/" class="navbar-brand">
+      <div class="brand-logo-badge"><img src="/images/logo.jpg" alt="PHOENIX Logo"></div>
+      <div class="brand-text-group">
+        <span class="brand-title">PHOENIX</span>
+        <span class="brand-subtitle">MBM University</span>
+      </div>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+
+    <div class="nav-menu" id="navMenu">
+      <ul class="nav-links">
+        <li class="nav-item"><a href="/" class="nav-link <%= typeof activePage !== 'undefined' && activePage === 'home' ? 'active' : '' %>">Home</a></li>
+        <li class="nav-item"><a href="/portfolio" class="nav-link <%= typeof activePage !== 'undefined' && activePage === 'portfolio' ? 'active' : '' %>">Showcase</a></li>
+        <li class="nav-item"><a href="/#about" class="nav-link">About Club</a></li>
+        <li class="nav-item"><a href="/#services" class="nav-link">Ecosystem</a></li>
+        <li class="nav-item"><a href="/#domains" class="nav-link">Domains</a></li>
+        <li class="nav-item"><a href="/#contact" class="nav-link">Connect</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <% if (typeof user !== 'undefined' && user) { %>
+          <div class="user-nav-group">
+            <a href="/notifications" class="nav-notif-bell" title="Activity Notifications">
+              🔔
+              <% if (typeof unreadNotifsCount !== 'undefined' && unreadNotifsCount > 0) { %>
+                <span class="notif-badge-count"><%= unreadNotifsCount %></span>
+              <% } %>
+            </a>
+
+            <% if (user.role === 'ADMIN') { %>
+              <a href="/admin/dashboard" class="btn btn-secondary btn-sm">Admin Dashboard</a>
+            <% } else if (user.role === 'FREELANCER') { %>
+              <a href="/freelancer/dashboard" class="btn btn-secondary btn-sm">Freelancer Dashboard</a>
+            <% } else if (user.role === 'CLIENT') { %>
+              <a href="/client/dashboard" class="btn btn-secondary btn-sm">Client Dashboard</a>
+            <% } %>
+
+            <div class="user-profile-badge" title="<%= user.email %> (<%= user.role %>)">
+              <span class="user-avatar"><%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %></span>
+              <span class="user-name"><%= user.name.split(' ')[0] %></span>
+            </div>
+
+            <form action="/logout" method="POST" class="logout-form">
+              <button type="submit" class="btn btn-outline btn-sm">Logout</button>
+            </form>
+          </div>
+        <% } else { %>
+          <a href="/login" class="btn btn-outline btn-sm <%= typeof activePage !== 'undefined' && activePage === 'login' ? 'active' : '' %>">Login</a>
+          <a href="/register" class="btn btn-primary btn-sm <%= typeof activePage !== 'undefined' && activePage === 'register' ? 'active' : '' %>">Join PHOENIX</a>
+        <% } %>
+      </div>
+    </div>
+  </nav>
+</header>

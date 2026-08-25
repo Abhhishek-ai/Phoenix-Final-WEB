@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Account Suspended | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <div class="flash-container">
+    <%- include('../partials/flash') %>
+  </div>
+
+  <main class="auth-main">
+    <div class="auth-card status-card">
+      <div class="status-icon-wrapper status-suspended">
+        <span>⏸️</span>
+      </div>
+
+      <div class="auth-header">
+        <span class="status-pill status-pill-suspended">Status: Temporarily Suspended</span>
+        <h1 class="auth-title">Account Suspended</h1>
+        <p class="auth-subtitle">
+          Your PHOENIX account access has been temporarily suspended.
+        </p>
+      </div>
+
+      <div class="status-content-box">
+        <p class="status-text">
+          Access to your account has been paused by the platform administrators. This may be due to pending policy verification, project dispute review, or code quality standards.
+        </p>
+        <p class="status-contact-note">
+          If you believe this is in error or need assistance resolving this status, please contact the MBM PHOENIX club coordinators.
+        </p>
+      </div>
+
+      <div class="status-actions">
+        <a href="mailto:phoenix@mbm.ac.in" class="btn btn-primary btn-lg">Contact Coordinators</a>
+        <a href="/" class="btn btn-secondary btn-lg">Back to Homepage</a>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

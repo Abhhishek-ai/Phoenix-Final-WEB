@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Freelancer Details | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Header -->
+        <div class="details-top-bar">
+          <a href="/admin/freelancers" class="btn btn-outline btn-sm">&larr; Back to Directory</a>
+          <span class="status-badge status-badge-<%= freelancer.status ? freelancer.status.toLowerCase() : 'pending' %> status-badge-lg">
+            Account <%= freelancer.status %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Profile Hero Banner -->
+        <div class="profile-hero-card">
+          <div class="profile-hero-left">
+            <div class="profile-avatar-large">
+              <%= freelancer.name ? freelancer.name.charAt(0).toUpperCase() : 'S' %>
+            </div>
+            <div>
+              <h1 class="profile-hero-name"><%= freelancer.name %></h1>
+              <p class="profile-hero-meta">
+                <span>🎓 <%= profile.branch ? profile.branch : 'MBM Student' %></span>
+                <span>&bull;</span>
+                <span>
+                  <% if (profile.year) { %>
+                    <%= profile.year %><% if (profile.year === 1) { %>st<% } else if (profile.year === 2) { %>nd<% } else if (profile.year === 3) { %>rd<% } else { %>th<% } %> Year
+                  <% } else { %>
+                    Student
+                  <% } %>
+                </span>
+                <span>&bull;</span>
+                <span>ID: <%= profile.enrollmentNumber ? profile.enrollmentNumber : 'N/A' %></span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons Group (Based on Account Status) -->
+          <div class="profile-action-controls">
+            <% if (freelancer.status === 'PENDING') { %>
+              <form action="/admin/freelancers/<%= freelancer._id %>/approve" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-success btn-md" onclick="return confirm('Approve this freelancer for active platform access?')">
+                  ✓ Approve Freelancer
+                </button>
+              </form>
+              <form action="/admin/freelancers/<%= freelancer._id %>/reject" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-md" onclick="return confirm('Reject this student registration?')">
+                  ✕ Reject Application
+                </button>
+              </form>
+            <% } else if (freelancer.status === 'ACTIVE') { %>
+              <form action="/admin/freelancers/<%= freelancer._id %>/suspend" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-warning btn-md" onclick="return confirm('Temporarily suspend this freelancer account?')">
+                  ⏸️ Suspend Account
+                </button>
+              </form>
+            <% } else if (freelancer.status === 'SUSPENDED') { %>
+              <form action="/admin/freelancers/<%= freelancer._id %>/reactivate" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-success btn-md" onclick="return confirm('Reactivate this freelancer account to ACTIVE status?')">
+                  ✓ Reactivate Account
+                </button>
+              </form>
+            <% } else if (freelancer.status === 'REJECTED') { %>
+              <form action="/admin/freelancers/<%= freelancer._id %>/approve" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-primary btn-md" onclick="return confirm('Re-evaluate and approve this previously rejected freelancer?')">
+                  ✓ Re-Approve Registration
+                </button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Detail Panels Grid -->
+        <div class="details-grid-2">
+          <!-- Left Column -->
+          <div class="details-column">
+            <!-- Personal Information -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Personal Information</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Full Name</span>
+                  <span class="info-value"><%= freelancer.name %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Email Address</span>
+                  <span class="info-value mono-text"><%= freelancer.email %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Phone Number</span>
+                  <span class="info-value"><%= profile.phone ? profile.phone : 'Not provided' %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Academic Information</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Enrollment Number</span>
+                  <span class="info-value mono-text"><%= profile.enrollmentNumber ? profile.enrollmentNumber : 'N/A' %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Engineering Branch</span>
+                  <span class="info-value"><%= profile.branch ? profile.branch : 'N/A' %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Current Year</span>
+                  <span class="info-value">
+                    <% if (profile.year) { %>
+                      <%= profile.year %><% if (profile.year === 1) { %>st<% } else if (profile.year === 2) { %>nd<% } else if (profile.year === 3) { %>rd<% } else { %>th<% } %> Year of Engineering
+                    <% } else { %>
+                      N/A
+                    <% } %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Institution</span>
+                  <span class="info-value">MBM University, Jodhpur</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Metadata -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Account Metadata</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">User ID</span>
+                  <span class="info-value mono-text"><%= freelancer._id %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Account Role</span>
+                  <span class="info-value"><%= freelancer.role %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Current Status</span>
+                  <span class="info-value">
+                    <span class="status-badge status-badge-<%= freelancer.status ? freelancer.status.toLowerCase() : 'pending' %>">
+                      <%= freelancer.status %>
+                    </span>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Registered Date</span>
+                  <span class="info-value"><%= new Date(freelancer.createdAt).toLocaleString('en-IN') %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Last Updated</span>
+                  <span class="info-value"><%= new Date(freelancer.updatedAt).toLocaleString('en-IN') %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="details-column">
+            <!-- Profile Overview & Bio -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Freelancer Profile Overview</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Experience Level</span>
+                  <span class="info-value">
+                    <span class="level-badge"><%= profile.experienceLevel ? profile.experienceLevel : 'BEGINNER' %></span>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Availability</span>
+                  <span class="info-value">
+                    <% if (profile.availability !== false) { %>
+                      <span class="avail-badge avail-open">● Available for Projects</span>
+                    <% } else { %>
+                      <span class="avail-badge avail-busy">● Currently Busy</span>
+                    <% } %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Platform Rating</span>
+                  <span class="info-value">⭐ <%= typeof profile.rating !== 'undefined' ? profile.rating : '0' %> / 5.0</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Completed Projects</span>
+                  <span class="info-value"><%= profile.completedProjects || 0 %> Projects</span>
+                </div>
+              </div>
+
+              <div class="bio-block">
+                <span class="info-label">Student Bio</span>
+                <p class="bio-text">
+                  <% if (profile.bio && profile.bio.trim().length > 0) { %>
+                    <%= profile.bio %>
+                  <% } else { %>
+                    <em>No bio entered yet by the freelancer.</em>
+                  <% } %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Skills List -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Skills & Competencies</h3>
+              <% if (profile.skills && profile.skills.length > 0) { %>
+                <div class="skills-tag-group">
+                  <% profile.skills.forEach(function(s) { %>
+                    <span class="skill-tag">
+                      <%= typeof s === 'object' && s.name ? s.name : s %>
+                    </span>
+                  <% }); %>
+                </div>
+              <% } else { %>
+                <p class="text-muted"><em>No specific skills tagged yet.</em></p>
+              <% } %>
+            </div>
+
+            <!-- Portfolio Links -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Portfolio & External Profiles</h3>
+              <div class="portfolio-links-grid">
+                <% 
+                  const links = profile.portfolioLinks || {};
+                  const hasAnyLink = links.github || links.linkedin || links.behance || links.dribbble || links.website;
+                %>
+                <% if (hasAnyLink) { %>
+                  <% if (links.github) { %>
+                    <a href="<%= links.github %>" target="_blank" rel="noopener" class="portfolio-link-item">
+                      <span class="link-icon">🐙</span> GitHub Profile &rarr;
+                    </a>
+                  <% } %>
+                  <% if (links.linkedin) { %>
+                    <a href="<%= links.linkedin %>" target="_blank" rel="noopener" class="portfolio-link-item">
+                      <span class="link-icon">💼</span> LinkedIn Profile &rarr;
+                    </a>
+                  <% } %>
+                  <% if (links.behance) { %>
+                    <a href="<%= links.behance %>" target="_blank" rel="noopener" class="portfolio-link-item">
+                      <span class="link-icon">🎨</span> Behance Portfolio &rarr;
+                    </a>
+                  <% } %>
+                  <% if (links.dribbble) { %>
+                    <a href="<%= links.dribbble %>" target="_blank" rel="noopener" class="portfolio-link-item">
+                      <span class="link-icon">🏀</span> Dribbble &rarr;
+                    </a>
+                  <% } %>
+                  <% if (links.website) { %>
+                    <a href="<%= links.website %>" target="_blank" rel="noopener" class="portfolio-link-item">
+                      <span class="link-icon">🔗</span> Personal Website &rarr;
+                    </a>
+                  <% } %>
+                <% } else { %>
+                  <p class="text-muted"><em>No external portfolio links provided yet.</em></p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

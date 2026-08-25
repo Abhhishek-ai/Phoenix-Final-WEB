@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Portfolio Approval Queue | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Portfolio Approval Queue</h1>
+            <p class="page-main-subtitle">Review student project submissions before publishing them to the public showcase gallery</p>
+          </div>
+          <div>
+            <a href="/portfolio" target="_blank" class="btn btn-outline btn-sm">View Public Showcase ↗</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="toolbar-card">
+          <div class="filter-tabs">
+            <a href="/admin/portfolios" class="filter-tab <%= typeof currentStatus !== 'undefined' && currentStatus === 'ALL' ? 'active' : '' %>">
+              All Submissions
+            </a>
+            <a href="/admin/portfolios?status=PENDING_REVIEW" class="filter-tab tab-pending <%= typeof currentStatus !== 'undefined' && currentStatus === 'PENDING_REVIEW' ? 'active' : '' %>">
+              Pending Review
+            </a>
+            <a href="/admin/portfolios?status=APPROVED" class="filter-tab tab-active <%= typeof currentStatus !== 'undefined' && currentStatus === 'APPROVED' ? 'active' : '' %>">
+              Approved
+            </a>
+            <a href="/admin/portfolios?status=REJECTED" class="filter-tab tab-suspended <%= typeof currentStatus !== 'undefined' && currentStatus === 'REJECTED' ? 'active' : '' %>">
+              Rejected
+            </a>
+          </div>
+        </div>
+
+        <!-- Portfolio Queue List -->
+        <% if (typeof portfolios !== 'undefined' && portfolios.length > 0) { %>
+          <div class="portfolio-showcase-grid">
+            <% portfolios.forEach(function(item) { %>
+              <div class="portfolio-item-card">
+                <div class="portfolio-card-media">
+                  <% if (item.media && item.media.length > 0 && item.media[0].url) { %>
+                    <img src="<%= item.media[0].url %>" alt="<%= item.title %>" class="portfolio-img">
+                  <% } else { %>
+                    <div class="portfolio-placeholder-img">
+                      <span>🎨 No Media Uploaded</span>
+                    </div>
+                  <% } %>
+                  <span class="portfolio-status-pill status-badge-<%= item.status === 'APPROVED' ? 'active' : (item.status === 'REJECTED' ? 'suspended' : 'pending') %>">
+                    <%= item.status.replace('_', ' ') %>
+                  </span>
+                </div>
+
+                <div class="portfolio-card-body">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                    <span class="domain-tag-sm"><%= item.category ? item.category.replace('_', ' ') : 'General' %></span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">
+                      👤 <%= item.freelancerId ? item.freelancerId.name : 'Student' %>
+                    </span>
+                  </div>
+
+                  <h3 class="portfolio-card-title"><%= item.title %></h3>
+                  <p class="portfolio-card-desc"><%= item.description %></p>
+
+                  <% if (item.skills && item.skills.length > 0) { %>
+                    <div class="skills-tag-group" style="margin: 0.75rem 0;">
+                      <% item.skills.forEach(function(s) { %>
+                        <span class="skill-tag skill-tag-sm">
+                          <%= typeof s === 'object' && s.name ? s.name : s %>
+                        </span>
+                      <% }); %>
+                    </div>
+                  <% } %>
+
+                  <div class="portfolio-links-row">
+                    <% if (item.projectLink) { %>
+                      <a href="<%= item.projectLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                        🌐 Live Demo ↗
+                      </a>
+                    <% } %>
+                    <% if (item.githubLink) { %>
+                      <a href="<%= item.githubLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                        💻 GitHub ↗
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+
+                <div class="portfolio-card-footer" style="gap: 0.5rem; flex-wrap: wrap;">
+                  <% if (item.status === 'PENDING_REVIEW') { %>
+                    <form action="/admin/portfolios/<%= item._id %>/approve" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-success btn-xs" onclick="return confirm('Approve this project for the public gallery?')">
+                        ✓ Approve & Publish
+                      </button>
+                    </form>
+                    <form action="/admin/portfolios/<%= item._id %>/reject" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('Reject this portfolio submission?')">
+                        ✕ Reject
+                      </button>
+                    </form>
+                  <% } else if (item.status === 'APPROVED') { %>
+                    <span class="accepted-badge-text" style="font-size: 0.75rem;">✓ Published on Showcase</span>
+                    <form action="/admin/portfolios/<%= item._id %>/reject" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-xs">Unpublish</button>
+                    </form>
+                  <% } else { %>
+                    <span class="text-muted" style="font-size: 0.75rem;">Rejected</span>
+                    <form action="/admin/portfolios/<%= item._id %>/approve" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-success btn-xs">Re-Approve</button>
+                    </form>
+                  <% } %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="admin-section-card">
+            <div class="empty-state">
+              <span class="empty-state-icon">🎨</span>
+              <h3>No Portfolio Submissions in this Queue</h3>
+              <p>When student freelancers submit projects for the showcase, they will appear here for review.</p>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

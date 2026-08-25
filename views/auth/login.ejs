@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Login | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <div class="flash-container">
+    <%- include('../partials/flash') %>
+  </div>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand-logo-badge auth-badge"><img src="/images/logo.jpg" alt="PHOENIX Logo"></div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Log in to your PHOENIX MBM University account</p>
+      </div>
+
+      <% if (typeof errors !== 'undefined' && errors.general) { %>
+        <div class="alert alert-error">
+          <div class="alert-content">
+            <span class="alert-icon">⚠</span>
+            <span><%= errors.general.msg %></span>
+          </div>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control <%= typeof errors !== 'undefined' && errors.email ? 'is-invalid' : '' %>" 
+            placeholder="e.g. yourname@mbm.ac.in" 
+            value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" 
+            required
+            autocomplete="email"
+          >
+          <% if (typeof errors !== 'undefined' && errors.email) { %>
+            <span class="form-error"><%= errors.email.msg %></span>
+          <% } %>
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-control <%= typeof errors !== 'undefined' && errors.password ? 'is-invalid' : '' %>" 
+            placeholder="Enter your account password" 
+            required
+            autocomplete="current-password"
+          >
+          <% if (typeof errors !== 'undefined' && errors.password) { %>
+            <span class="form-error"><%= errors.password.msg %></span>
+          <% } %>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Log In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>New to PHOENIX? <a href="/register" class="auth-link">Register as Student Freelancer</a></p>
+        <p><a href="/" class="auth-link-secondary">&larr; Back to Home</a></p>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

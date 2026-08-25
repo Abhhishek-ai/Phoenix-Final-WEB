@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Freelancer Registration | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <div class="flash-container">
+    <%- include('../partials/flash') %>
+  </div>
+
+  <main class="auth-main">
+    <div class="auth-card register-card">
+      <div class="auth-header">
+        <div class="brand-logo-badge auth-badge"><img src="/images/logo.jpg" alt="PHOENIX Logo"></div>
+        <h1 class="auth-title">Student Freelancer Registration</h1>
+        <p class="auth-subtitle">Join the official MBM University student freelancing club & platform</p>
+      </div>
+
+      <% if (typeof errors !== 'undefined' && errors.general) { %>
+        <div class="alert alert-error">
+          <div class="alert-content">
+            <span class="alert-icon">⚠</span>
+            <span><%= errors.general.msg %></span>
+          </div>
+        </div>
+      <% } %>
+
+      <form action="/register" method="POST" class="auth-form" novalidate>
+        <!-- Section 1: Personal Information -->
+        <div class="form-section">
+          <div class="section-badge-header">
+            <span class="badge-step">1</span>
+            <h3 class="form-section-title">Personal Information</h3>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="name" class="form-label">Full Name <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.name ? 'is-invalid' : '' %>" 
+                placeholder="e.g. Rahul Sharma" 
+                value="<%= typeof formData !== 'undefined' && formData.name ? formData.name : '' %>" 
+                required
+              >
+              <% if (typeof errors !== 'undefined' && errors.name) { %>
+                <span class="form-error"><%= errors.name.msg %></span>
+              <% } %>
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone Number <span class="required">*</span></label>
+              <input 
+                type="tel" 
+                id="phone" 
+                name="phone" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.phone ? 'is-invalid' : '' %>" 
+                placeholder="10-digit mobile number" 
+                value="<%= typeof formData !== 'undefined' && formData.phone ? formData.phone : '' %>" 
+                required
+              >
+              <% if (typeof errors !== 'undefined' && errors.phone) { %>
+                <span class="form-error"><%= errors.phone.msg %></span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Academic Information -->
+        <div class="form-section">
+          <div class="section-badge-header">
+            <span class="badge-step">2</span>
+            <h3 class="form-section-title">MBM Academic Information</h3>
+          </div>
+
+          <div class="form-grid-2">
+
+            <div class="form-group">
+              <label for="branch" class="form-label">Branch <span class="required">*</span></label>
+              <select 
+                id="branch" 
+                name="branch" 
+                class="form-control form-select <%= typeof errors !== 'undefined' && errors.branch ? 'is-invalid' : '' %>" 
+                required
+              >
+                <option value="">Select Branch</option>
+                <% 
+                  const branches = [
+                    'Computer Science & Engineering',
+                    'Information Technology',
+                    'Electronics & Communication',
+                    'Electrical Engineering',
+                    'Mechanical Engineering',
+                    'Civil Engineering',
+                    'Mining Engineering',
+                    'Production & Industrial',
+                    'Chemical Engineering',
+                    'Structural Engineering',
+                    'Other'
+                  ];
+                  const currentBranch = typeof formData !== 'undefined' && formData.branch ? formData.branch : '';
+                %>
+                <% branches.forEach(b => { %>
+                  <option value="<%= b %>" <%= currentBranch === b ? 'selected' : '' %>><%= b %></option>
+                <% }) %>
+              </select>
+              <% if (typeof errors !== 'undefined' && errors.branch) { %>
+                <span class="form-error"><%= errors.branch.msg %></span>
+              <% } %>
+            </div>
+
+            <div class="form-group">
+              <label for="year" class="form-label">Year of Study <span class="required">*</span></label>
+              <select 
+                id="year" 
+                name="year" 
+                class="form-control form-select <%= typeof errors !== 'undefined' && errors.year ? 'is-invalid' : '' %>" 
+                required
+              >
+                <option value="">Select Year</option>
+                <% const currentYear = typeof formData !== 'undefined' && formData.year ? Number(formData.year) : 0; %>
+                <option value="1" <%= currentYear === 1 ? 'selected' : '' %>>1st Year</option>
+                <option value="2" <%= currentYear === 2 ? 'selected' : '' %>>2nd Year</option>
+                <option value="3" <%= currentYear === 3 ? 'selected' : '' %>>3rd Year</option>
+                <option value="4" <%= currentYear === 4 ? 'selected' : '' %>>4th Year</option>
+                <option value="5" <%= currentYear === 5 ? 'selected' : '' %>>5th Year / PG</option>
+              </select>
+              <% if (typeof errors !== 'undefined' && errors.year) { %>
+                <span class="form-error"><%= errors.year.msg %></span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Account Credentials -->
+        <div class="form-section">
+          <div class="section-badge-header">
+            <span class="badge-step">3</span>
+            <h3 class="form-section-title">Account Information</h3>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address <span class="required">*</span></label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-control <%= typeof errors !== 'undefined' && errors.email ? 'is-invalid' : '' %>" 
+              placeholder="e.g. rahul.sharma@mbm.ac.in" 
+              value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" 
+              required
+              autocomplete="email"
+            >
+            <% if (typeof errors !== 'undefined' && errors.email) { %>
+              <span class="form-error"><%= errors.email.msg %></span>
+            <% } %>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label for="password" class="form-label">Password <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.password ? 'is-invalid' : '' %>" 
+                placeholder="At least 8 characters" 
+                required
+                autocomplete="new-password"
+              >
+              <% if (typeof errors !== 'undefined' && errors.password) { %>
+                <span class="form-error"><%= errors.password.msg %></span>
+              <% } %>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">Confirm Password <span class="required">*</span></label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.confirmPassword ? 'is-invalid' : '' %>" 
+                placeholder="Re-type your password" 
+                required
+                autocomplete="new-password"
+              >
+              <% if (typeof errors !== 'undefined' && errors.confirmPassword) { %>
+                <span class="form-error"><%= errors.confirmPassword.msg %></span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-notice">
+          <p>
+            🛡️ <strong>Note:</strong> Submitted profiles are placed in <strong>Pending</strong> status until verified by club coordinators. You will receive access once approved.
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          Submit Freelancer Registration
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="/login" class="auth-link">Log In here</a></p>
+        <p><a href="/" class="auth-link-secondary">&larr; Back to Home</a></p>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

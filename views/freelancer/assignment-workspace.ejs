@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Project Workspace | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Status Pill -->
+        <div class="details-top-bar">
+          <a href="/freelancer/assignments" class="btn btn-outline btn-sm">&larr; Back to My Assignments</a>
+          <span class="status-badge status-badge-<%= assignment.status ? assignment.status.toLowerCase() : 'assigned' %> status-badge-lg">
+            Assignment: <%= assignment.status.replace('_', ' ') %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Project Hero Card -->
+        <div class="profile-hero-card">
+          <div>
+            <span class="domain-tag-sm" style="margin-bottom: 0.5rem; display: inline-block;">
+              <%= assignment.projectId && assignment.projectId.category ? assignment.projectId.category.replace('_', ' ') : 'General' %>
+            </span>
+            <h1 class="profile-hero-name"><%= assignment.projectId ? assignment.projectId.title : 'Project Assignment' %></h1>
+            <p class="profile-hero-meta">
+              <span>📅 Assigned: <%= new Date(assignment.startDate).toLocaleDateString('en-IN') %></span>
+              <span>&bull;</span>
+              <span>👤 Assigned by: <%= assignment.assignedBy ? assignment.assignedBy.name : 'Administrator' %></span>
+              <span>&bull;</span>
+              <span>💰 Budget: ₹<%= assignment.projectId && assignment.projectId.budget ? assignment.projectId.budget.min.toLocaleString('en-IN') : '0' %> - ₹<%= assignment.projectId && assignment.projectId.budget ? assignment.projectId.budget.max.toLocaleString('en-IN') : '0' %></span>
+            </p>
+          </div>
+
+          <div class="profile-action-controls">
+            <a href="/assignments/<%= assignment._id %>/chat" class="btn btn-secondary btn-md">
+              💬 Project Chat
+            </a>
+
+            <% if (assignment.status !== 'COMPLETED' && assignment.status !== 'CANCELLED') { %>
+              <a href="/freelancer/assignments/<%= assignment._id %>/submit" class="btn btn-primary btn-md">
+                🚀 Submit Deliverables &rarr;
+              </a>
+            <% } else if (assignment.status === 'COMPLETED') { %>
+              <span class="accepted-badge-text" style="font-size: 1rem;">🏆 Project Completed & Approved</span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Workspace Grid Layout -->
+        <div class="details-grid-2">
+          <!-- Left Column: Scope & Submission History -->
+          <div class="details-column">
+            <!-- Project Scope Brief -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Project Scope Brief</h3>
+              <p style="white-space: pre-wrap; line-height: 1.7; color: var(--text-primary); font-size: 0.9375rem;"><%= assignment.projectId ? assignment.projectId.description : '' %></p>
+
+              <% if (assignment.projectId && assignment.projectId.requiredSkills && assignment.projectId.requiredSkills.length > 0) { %>
+                <div style="margin-top: 1.25rem;">
+                  <span class="info-label" style="display: block; margin-bottom: 0.5rem;">Target Skills:</span>
+                  <div class="skills-tag-group">
+                    <% assignment.projectId.requiredSkills.forEach(function(skill) { %>
+                      <span class="skill-tag">
+                        <%= typeof skill === 'object' && skill.name ? skill.name : skill %>
+                      </span>
+                    <% }); %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Deliverables Submission History -->
+            <div class="admin-section-card">
+              <div class="section-card-header">
+                <div>
+                  <h3 class="section-card-title">Submission & Deliverables History</h3>
+                  <p class="section-card-subtitle">Versioned archive of all files submitted for this project</p>
+                </div>
+                <% if (assignment.status !== 'COMPLETED') { %>
+                  <a href="/freelancer/assignments/<%= assignment._id %>/submit" class="btn btn-secondary btn-xs">+ New Version</a>
+                <% } %>
+              </div>
+
+              <% if (typeof deliverables !== 'undefined' && deliverables.length > 0) { %>
+                <div class="deliverables-timeline">
+                  <% deliverables.forEach(function(deliv) { %>
+                    <div class="deliverable-version-card <%= deliv.status === 'APPROVED' ? 'version-approved' : (deliv.status === 'REVISION_REQUIRED' ? 'version-revision' : '') %>">
+                      <div class="deliverable-version-header">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                          <span class="version-badge">Version <%= deliv.version %></span>
+                          <h4 class="deliverable-title"><%= deliv.title %></h4>
+                        </div>
+                        <span class="status-badge status-badge-<%= deliv.status ? deliv.status.toLowerCase() : 'submitted' %>">
+                          <%= deliv.status.replace('_', ' ') %>
+                        </span>
+                      </div>
+
+                      <% if (deliv.description) { %>
+                        <p class="deliverable-desc"><%= deliv.description %></p>
+                      <% } %>
+
+                      <!-- Attached Files -->
+                      <% if (deliv.files && deliv.files.length > 0) { %>
+                        <div class="attached-files-list">
+                          <% deliv.files.forEach(function(f) { %>
+                            <a href="<%= f.url %>" target="_blank" rel="noopener noreferrer" class="file-attachment-chip" download="<%= f.originalName %>">
+                              <span class="file-chip-icon">
+                                <% if (f.originalName.endsWith('.zip')) { %>📦
+                                <% } else if (f.originalName.endsWith('.pdf')) { %>📄
+                                <% } else if (f.originalName.match(/\.(jpg|jpeg|png|webp)$/i)) { %>🖼️
+                                <% } else if (f.originalName.endsWith('.mp4')) { %>🎥
+                                <% } else { %>📎<% } %>
+                              </span>
+                              <span class="file-chip-name"><%= f.originalName %></span>
+                              <% if (f.size) { %>
+                                <span class="file-chip-size">(<%= (f.size / (1024 * 1024)).toFixed(1) %> MB)</span>
+                              <% } %>
+                              <span class="file-download-arrow">&darr;</span>
+                            </a>
+                          <% }); %>
+                        </div>
+                      <% } %>
+
+                      <!-- Revision Feedback Alert -->
+                      <% if (deliv.status === 'REVISION_REQUIRED' && deliv.reviewFeedback) { %>
+                        <div class="revision-feedback-box">
+                          <div class="feedback-header">
+                            <span>💬 Coordinator / Admin Feedback:</span>
+                            <% if (deliv.reviewedBy) { %>
+                              <span class="reviewer-name">Reviewed by <%= deliv.reviewedBy.name %></span>
+                            <% } %>
+                          </div>
+                          <p class="feedback-text"><%= deliv.reviewFeedback %></p>
+                          <div style="margin-top: 0.75rem;">
+                            <a href="/freelancer/assignments/<%= assignment._id %>/submit" class="btn btn-warning btn-xs">
+                              🚀 Submit Revision (v<%= deliv.version + 1 %>)
+                            </a>
+                          </div>
+                        </div>
+                      <% } %>
+
+                      <div class="deliverable-footer-meta">
+                        <span>Submitted on <%= new Date(deliv.submittedAt).toLocaleString('en-IN') %></span>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              <% } else { %>
+                <div class="empty-state" style="padding: 2rem 1rem;">
+                  <span class="empty-state-icon">📦</span>
+                  <h3>No Deliverables Submitted Yet</h3>
+                  <p>When you finish your work or reach a project milestone, click "Submit Deliverables" to upload your files (ZIP, PDF, DOCX, Images, MP4).</p>
+                  <div style="margin-top: 1rem;">
+                    <a href="/freelancer/assignments/<%= assignment._id %>/submit" class="btn btn-primary btn-sm">🚀 Upload First Deliverable</a>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Right Column: Progress Telemetry & Deadline -->
+          <div class="details-column">
+            <!-- Progress Tracker Card -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Project Progress</h3>
+              <div class="progress-display-group">
+                <div class="progress-bar-container progress-bar-lg">
+                  <div class="progress-bar-fill" style="width: <%= assignment.progress || 0 %>%;"></div>
+                </div>
+                <div class="progress-percentage-label">
+                  <strong><%= assignment.progress || 0 %>%</strong> Completed
+                </div>
+              </div>
+
+              <% if (assignment.status !== 'COMPLETED') { %>
+                <!-- Interactive Progress Update Form -->
+                <form action="/freelancer/assignments/<%= assignment._id %>/progress" method="POST" class="progress-update-form">
+                  <label for="progressInput" class="form-label" style="font-size: 0.8125rem;">Update Current Progress (%):</label>
+                  <div class="progress-input-group">
+                    <input 
+                      type="range" 
+                      id="progressRange" 
+                      min="0" 
+                      max="100" 
+                      value="<%= assignment.progress || 0 %>"
+                      oninput="document.getElementById('progressInput').value = this.value"
+                    >
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                      <input 
+                        type="number" 
+                        id="progressInput" 
+                        name="progress" 
+                        min="0" 
+                        max="100" 
+                        class="form-control" 
+                        style="width: 70px; text-align: center;" 
+                        value="<%= assignment.progress || 0 %>"
+                        oninput="document.getElementById('progressRange').value = this.value"
+                        required
+                      >
+                      <button type="submit" class="btn btn-secondary btn-sm">Save</button>
+                    </div>
+                  </div>
+                </form>
+              <% } %>
+            </div>
+
+            <!-- Deadline Telemetry Card -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Timeline & Deadline</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Submission Deadline</span>
+                  <span class="info-value">
+                    ⏱️ <%= deadlineDate ? new Date(deadlineDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Deadline Status</span>
+                  <span class="info-value">
+                    <% if (isOverdue && assignment.status !== 'COMPLETED') { %>
+                      <span class="status-badge status-badge-suspended">⚠️ OVERDUE</span>
+                    <% } else if (assignment.status === 'COMPLETED') { %>
+                      <span class="status-badge status-badge-active">✓ Delivered</span>
+                    <% } else { %>
+                      <span class="status-badge status-badge-active"><%= daysRemaining %> Days Remaining</span>
+                    <% } %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Guidelines -->
+            <div class="admin-section-card" style="border-color: rgba(99, 102, 241, 0.3); background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), var(--bg-secondary));">
+              <h3 class="panel-title" style="color: #a5b4fc;">📋 Delivery Checklist</h3>
+              <ul style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.7; padding-left: 1.25rem;">
+                <li>Package source code and assets in a structured <code>.zip</code> archive.</li>
+                <li>Include a brief README or documentation PDF for client evaluation.</li>
+                <li>Files are securely stored via Cloudinary and accessible by review coordinators.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

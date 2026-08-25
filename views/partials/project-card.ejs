@@ -1,0 +1,47 @@
+<div class="project-market-card">
+  <div class="project-card-top">
+    <span class="project-domain-tag"><%= project.category ? project.category.replace('_', ' ') : 'GENERAL' %></span>
+    <span class="project-budget-tag">
+      ₹<%= project.budget && project.budget.min ? project.budget.min.toLocaleString('en-IN') : '0' %> - ₹<%= project.budget && project.budget.max ? project.budget.max.toLocaleString('en-IN') : '0' %>
+    </span>
+  </div>
+
+  <h3 class="project-card-title">
+    <a href="/freelancer/projects/<%= project._id %>"><%= project.title %></a>
+  </h3>
+
+  <p class="project-card-desc">
+    <% if (project.description && project.description.length > 130) { %>
+      <%= project.description.substring(0, 130) %>...
+    <% } else { %>
+      <%= project.description %>
+    <% } %>
+  </p>
+
+  <div class="project-card-skills">
+    <% if (project.requiredSkills && project.requiredSkills.length > 0) { %>
+      <% project.requiredSkills.slice(0, 4).forEach(function(skill) { %>
+        <span class="skill-pill">
+          <%= typeof skill === 'object' && skill.name ? skill.name : skill %>
+        </span>
+      <% }); %>
+      <% if (project.requiredSkills.length > 4) { %>
+        <span class="skill-pill skill-pill-more">+<%= project.requiredSkills.length - 4 %></span>
+      <% } %>
+    <% } else { %>
+      <span class="skill-pill">Open Skills</span>
+    <% } %>
+  </div>
+
+  <div class="project-card-footer">
+    <div class="project-deadline-info">
+      <span class="deadline-icon">⏱️</span>
+      <span class="deadline-text">
+        Deadline: <%= new Date(project.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+      </span>
+    </div>
+    <a href="/freelancer/projects/<%= project._id %>" class="btn btn-primary btn-sm">
+      View Project &rarr;
+    </a>
+  </div>
+</div>

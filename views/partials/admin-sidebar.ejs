@@ -1,0 +1,58 @@
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-category-label">CORE MANAGEMENT</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="sidebar-menu">
+      <li class="sidebar-item">
+        <a href="/admin/dashboard" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? 'active' : '' %>">
+          <span class="sidebar-icon">📊</span>
+          <span class="sidebar-text">Dashboard</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item">
+        <a href="/admin/freelancers" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'freelancers' ? 'active' : '' %>">
+          <span class="sidebar-icon">👥</span>
+          <span class="sidebar-text">Freelancers</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item">
+        <a href="/admin/projects" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'projects' ? 'active' : '' %>">
+          <span class="sidebar-icon">💼</span>
+          <span class="sidebar-text">Projects</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item">
+        <a href="/admin/assignments" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'assignments' ? 'active' : '' %>">
+          <span class="sidebar-icon">📋</span>
+          <span class="sidebar-text">Assignments & Work</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item">
+        <a href="/admin/portfolios" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'portfolios' ? 'active' : '' %>">
+          <span class="sidebar-icon">🎨</span>
+          <span class="sidebar-text">Portfolio Approvals</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item">
+        <a href="/notifications" class="sidebar-link <%= typeof activePage !== 'undefined' && activePage === 'notifications' ? 'active' : '' %>">
+          <span class="sidebar-icon">🔔</span>
+          <span class="sidebar-text">Notifications</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-system-badge">
+      <span class="status-dot"></span>
+      <span class="system-tag">MBM PHOENIX v1.0</span>
+    </div>
+  </div>
+</aside>

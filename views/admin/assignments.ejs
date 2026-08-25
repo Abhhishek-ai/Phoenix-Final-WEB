@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Platform Assignments | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Platform Project Assignments</h1>
+            <p class="page-main-subtitle">Overview of all active and completed student project assignments</p>
+          </div>
+          <div>
+            <a href="/admin/projects" class="btn btn-secondary btn-sm">View Projects Directory</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Assignments Table -->
+        <div class="admin-section-card">
+          <% if (typeof assignments !== 'undefined' && assignments.length > 0) { %>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Assigned Freelancer</th>
+                    <th>Assigned By</th>
+                    <th>Start Date</th>
+                    <th>Deadline</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% assignments.forEach(function(a) { %>
+                    <tr>
+                      <td>
+                        <strong>
+                          <a href="/admin/projects/<%= a.projectId ? a.projectId._id : '' %>" class="table-project-link">
+                            <%= a.projectId ? a.projectId.title : 'Project' %>
+                          </a>
+                        </strong>
+                      </td>
+                      <td>
+                        <div class="student-name-cell">
+                          <span class="table-avatar"><%= a.freelancerId && a.freelancerId.name ? a.freelancerId.name.charAt(0).toUpperCase() : 'S' %></span>
+                          <div>
+                            <span class="student-name"><%= a.freelancerId ? a.freelancerId.name : 'Unknown' %></span>
+                            <span class="student-enrollment"><%= a.freelancerId ? a.freelancerId.email : '' %></span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><%= a.assignedBy ? a.assignedBy.name : 'Admin' %></td>
+                      <td><%= new Date(a.startDate).toLocaleDateString('en-IN') %></td>
+                      <td><%= a.deadline ? new Date(a.deadline).toLocaleDateString('en-IN') : 'N/A' %></td>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <div class="progress-bar-container" style="width: 80px;">
+                            <div class="progress-bar-fill" style="width: <%= a.progress || 0 %>%;"></div>
+                          </div>
+                          <span class="progress-text"><%= a.progress || 0 %>%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="status-badge status-badge-<%= a.status ? a.status.toLowerCase() : 'assigned' %>">
+                          <%= a.status %>
+                        </span>
+                      </td>
+                      <td class="text-right">
+                        <a href="/admin/assignments/<%= a._id %>" class="btn btn-primary btn-xs">
+                          Review Workspace &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">📋</span>
+              <h3>No Project Assignments Yet</h3>
+              <p>When administrators accept proposals on open projects, the assignments will appear here.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

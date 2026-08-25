@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Project Marketplace | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Project Marketplace</h1>
+            <p class="page-main-subtitle">Browse open freelance contracts, campus projects, and technical initiatives</p>
+          </div>
+          <div>
+            <a href="/freelancer/bids" class="btn btn-secondary btn-sm">My Submitted Bids</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Marketplace Filter & Search Toolbar -->
+        <div class="marketplace-toolbar-card">
+          <!-- Search and Dropdown Controls Form -->
+          <form action="/freelancer/projects" method="GET" class="market-filter-form">
+            <div class="market-filter-row">
+              <!-- Search Title -->
+              <div class="market-search-box">
+                <span class="search-icon">🔍</span>
+                <input 
+                  type="text" 
+                  name="search" 
+                  class="market-search-input" 
+                  placeholder="Search projects by title..." 
+                  value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                >
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  <a href="/freelancer/projects" class="clear-search-btn" title="Clear search">&times;</a>
+                <% } %>
+              </div>
+
+              <!-- Skill Filter -->
+              <div class="market-select-box">
+                <select name="skill" class="form-control form-select market-select">
+                  <option value="">All Skills</option>
+                  <% if (typeof skills !== 'undefined') { %>
+                    <% skills.forEach(function(s) { %>
+                      <option value="<%= s._id %>" <%= typeof currentSkill !== 'undefined' && currentSkill === s._id.toString() ? 'selected' : '' %>>
+                        <%= s.name %> (<%= s.category.replace('_', ' ') %>)
+                      </option>
+                    <% }); %>
+                  <% } %>
+                </select>
+              </div>
+
+              <!-- Sorting Whitelist -->
+              <div class="market-select-box">
+                <select name="sort" class="form-control form-select market-select">
+                  <option value="newest" <%= typeof currentSort !== 'undefined' && currentSort === 'newest' ? 'selected' : '' %>>Newest First</option>
+                  <option value="deadline" <%= typeof currentSort !== 'undefined' && currentSort === 'deadline' ? 'selected' : '' %>>Deadline Soonest</option>
+                  <option value="budget_desc" <%= typeof currentSort !== 'undefined' && currentSort === 'budget_desc' ? 'selected' : '' %>>Highest Budget</option>
+                  <option value="budget_asc" <%= typeof currentSort !== 'undefined' && currentSort === 'budget_asc' ? 'selected' : '' %>>Lowest Budget</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-sm market-apply-btn">Apply Filters</button>
+            </div>
+
+            <!-- Domain Category Pills -->
+            <div class="category-pills-scroll">
+              <a href="/freelancer/projects<%= typeof searchQuery !== 'undefined' && searchQuery ? '?search=' + encodeURIComponent(searchQuery) : '' %>" 
+                 class="cat-pill <%= typeof currentCategory !== 'undefined' && currentCategory === 'ALL' ? 'active' : '' %>">
+                All Domains
+              </a>
+              <% if (typeof categories !== 'undefined') { %>
+                <% categories.forEach(function(cat) { %>
+                  <a href="/freelancer/projects?category=<%= cat %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %><%= typeof currentSkill !== 'undefined' && currentSkill ? '&skill=' + currentSkill : '' %>" 
+                     class="cat-pill <%= typeof currentCategory !== 'undefined' && currentCategory === cat ? 'active' : '' %>">
+                    <%= cat.replace('_', ' ') %>
+                  </a>
+                <% }); %>
+              <% } %>
+            </div>
+          </form>
+        </div>
+
+        <!-- Projects Grid Section -->
+        <% if (typeof projects !== 'undefined' && projects.length > 0) { %>
+          <div class="projects-market-grid">
+            <% projects.forEach(function(project) { %>
+              <%- include('../partials/project-card', { project: project }) %>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="admin-section-card">
+            <div class="empty-state">
+              <span class="empty-state-icon">🔍</span>
+              <h3>
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  No Projects Matched Your Search
+                <% } else { %>
+                  No Projects Available Right Now
+                <% } %>
+              </h3>
+              <p>
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  Try adjusting your keywords or clearing the category and skill filters.
+                <% } else { %>
+                  There are no open projects under this domain right now. Check back soon!
+                <% } %>
+              </p>
+              <div style="margin-top: 1.25rem;">
+                <a href="/freelancer/projects" class="btn btn-outline btn-sm">Reset All Filters</a>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

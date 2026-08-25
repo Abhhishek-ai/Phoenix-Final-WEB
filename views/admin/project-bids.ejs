@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Project Proposals | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Header -->
+        <div class="details-top-bar">
+          <a href="/admin/projects/<%= project._id %>" class="btn btn-outline btn-sm">&larr; Back to <%= project.title %></a>
+          <span class="status-badge status-badge-<%= project.status ? project.status.toLowerCase() : 'open' %> status-badge-lg">
+            Project: <%= project.status %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Summary Header Card -->
+        <div class="profile-hero-card">
+          <div>
+            <span class="domain-tag-sm"><%= project.category ? project.category.replace('_', ' ') : 'General' %></span>
+            <h1 class="profile-hero-name">Proposals for: <%= project.title %></h1>
+            <p class="profile-hero-meta">
+              <span>💰 Budget: ₹<%= project.budget.min.toLocaleString('en-IN') %> - ₹<%= project.budget.max.toLocaleString('en-IN') %></span>
+              <span>&bull;</span>
+              <span>⏱️ Deadline: <%= new Date(project.deadline).toLocaleDateString('en-IN') %></span>
+              <span>&bull;</span>
+              <span>📊 <%= bids ? bids.length : 0 %> <%= bids && bids.length === 1 ? 'Proposal' : 'Proposals' %> Received</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Bids Comparison List -->
+        <div class="bids-management-list">
+          <% if (typeof bids !== 'undefined' && bids.length > 0) { %>
+            <% bids.forEach(function(bid) { %>
+              <div class="admin-bid-card <%= bid.status === 'ACCEPTED' ? 'bid-accepted-card' : '' %>">
+                <div class="bid-card-header">
+                  <div class="bidder-info-left">
+                    <span class="table-avatar"><%= bid.freelancerId && bid.freelancerId.name ? bid.freelancerId.name.charAt(0).toUpperCase() : 'S' %></span>
+                    <div>
+                      <h3 class="bidder-name">
+                        <a href="/admin/freelancers/<%= bid.freelancerId ? bid.freelancerId._id : '' %>" target="_blank" class="table-project-link">
+                          <%= bid.freelancerId ? bid.freelancerId.name : 'Student Freelancer' %> &rarr;
+                        </a>
+                      </h3>
+                      <p class="bidder-meta">
+                        <span><%= bid.freelancerId ? bid.freelancerId.email : '' %></span>
+                        <% if (bid.profile && bid.profile.branch) { %>
+                          <span>&bull; <%= bid.profile.branch %> (<%= bid.profile.year %> Year)</span>
+                        <% } %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Bid Specs & Status -->
+                  <div class="bid-pricing-box">
+                    <div class="bid-amount-tag">₹<%= bid.amount ? bid.amount.toLocaleString('en-IN') : '0' %></div>
+                    <div class="bid-days-tag">⏱️ <%= bid.estimatedDays %> Days Delivery</div>
+                    <span class="status-badge status-badge-<%= bid.status ? bid.status.toLowerCase() : 'pending' %>">
+                      <%= bid.status %>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Bidder Verified Skills -->
+                <div class="bidder-skills-row">
+                  <span class="info-label" style="font-size: 0.75rem;">Verified Skills:</span>
+                  <% if (bid.profile && bid.profile.skills && bid.profile.skills.length > 0) { %>
+                    <div class="skills-tag-group">
+                      <% bid.profile.skills.forEach(function(skill) { %>
+                        <span class="skill-tag skill-tag-sm">
+                          <%= typeof skill === 'object' && skill.name ? skill.name : skill %>
+                        </span>
+                      <% }); %>
+                    </div>
+                  <% } else { %>
+                    <span class="text-muted" style="font-size: 0.8125rem;"><em>Skills not tagged yet</em></span>
+                  <% } %>
+                </div>
+
+                <!-- Proposal Body -->
+                <div class="bid-proposal-box">
+                  <h4 class="proposal-title">Student Proposal</h4>
+                  <p class="proposal-text"><%= bid.proposal %></p>
+                </div>
+
+                <!-- Footer with Action Buttons -->
+                <div class="bid-card-footer">
+                  <span class="bid-date-text">
+                    Submitted on <%= new Date(bid.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                  </span>
+
+                  <div class="bid-actions-group">
+                    <% if (bid.status === 'PENDING' && project.status === 'OPEN') { %>
+                      <form action="/admin/bids/<%= bid._id %>/accept" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Accept this bid? The project will be automatically assigned to <%= bid.freelancerId ? bid.freelancerId.name : 'this freelancer' %>, and other pending proposals will be rejected.')">
+                          ✓ Accept Bid & Assign Project
+                        </button>
+                      </form>
+                      <form action="/admin/bids/<%= bid._id %>/reject" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Reject this individual proposal?')">
+                          ✕ Reject Bid
+                        </button>
+                      </form>
+                    <% } else if (bid.status === 'ACCEPTED') { %>
+                      <span class="accepted-badge-text">✓ Accepted & Assigned Freelancer</span>
+                    <% } else if (bid.status === 'REJECTED') { %>
+                      <span class="rejected-badge-text">Proposal Not Selected</span>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="admin-section-card">
+              <div class="empty-state">
+                <span class="empty-state-icon">🏷️</span>
+                <h3>No Proposals Submitted Yet</h3>
+                <p>When student freelancers submit bids on this project, they will appear here with technical skill comparisons and proposals.</p>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

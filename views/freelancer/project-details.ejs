@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Project Details | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Status -->
+        <div class="details-top-bar">
+          <a href="/freelancer/projects" class="btn btn-outline btn-sm">&larr; Back to Marketplace</a>
+          <span class="status-badge status-badge-<%= project.status ? project.status.toLowerCase() : 'open' %> status-badge-lg">
+            Project <%= project.status %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Hero Header -->
+        <div class="profile-hero-card">
+          <div>
+            <span class="domain-tag-sm" style="margin-bottom: 0.5rem; display: inline-block;">
+              <%= project.category ? project.category.replace('_', ' ') : 'General' %>
+            </span>
+            <h1 class="profile-hero-name"><%= project.title %></h1>
+            <p class="profile-hero-meta">
+              <span>📅 Published on <%= new Date(project.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+              <span>&bull;</span>
+              <span>🏛️ MBM University Project Hub</span>
+            </p>
+          </div>
+
+          <!-- Bidding Action Controls -->
+          <div class="profile-action-controls">
+            <% if (existingBid) { %>
+              <div class="existing-bid-badge-box">
+                <span class="bid-submitted-tag">✓ You have bid ₹<%= existingBid.amount ? existingBid.amount.toLocaleString('en-IN') : '' %></span>
+                <a href="/freelancer/bids/<%= existingBid._id %>" class="btn btn-secondary btn-md">
+                  View My Bid &rarr;
+                </a>
+              </div>
+            <% } else if (project.status === 'OPEN') { %>
+              <a href="/freelancer/projects/<%= project._id %>/bid" class="btn btn-primary btn-lg">
+                🏷️ Bid on this Project &rarr;
+              </a>
+            <% } else { %>
+              <span class="btn btn-secondary btn-lg disabled" style="opacity: 0.6; cursor: not-allowed;">
+                Project Closed for Bids
+              </span>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="details-grid-2">
+          <!-- Left Column: Scope & Description -->
+          <div class="details-column">
+            <div class="admin-section-card">
+              <h3 class="panel-title">Project Scope & Deliverables</h3>
+              <div class="project-full-desc">
+                <p style="white-space: pre-wrap; line-height: 1.8; color: var(--text-primary); font-size: 0.9375rem;"><%= project.description %></p>
+              </div>
+            </div>
+
+            <!-- Required Skills -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Required Skills & Technologies</h3>
+              <% if (project.requiredSkills && project.requiredSkills.length > 0) { %>
+                <div class="skills-tag-group">
+                  <% project.requiredSkills.forEach(function(skill) { %>
+                    <span class="skill-tag">
+                      <%= typeof skill === 'object' && skill.name ? skill.name : skill %>
+                    </span>
+                  <% }); %>
+                </div>
+              <% } else { %>
+                <p class="text-muted"><em>Open to all skills.</em></p>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Right Column: Budget, Timeline & Guidelines -->
+          <div class="details-column">
+            <div class="admin-section-card">
+              <h3 class="panel-title">Project Overview</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Budget Range</span>
+                  <span class="info-value mono-text" style="color: var(--accent-emerald); font-size: 1.125rem; font-weight: 800;">
+                    ₹<%= project.budget && project.budget.min ? project.budget.min.toLocaleString('en-IN') : '0' %> - ₹<%= project.budget && project.budget.max ? project.budget.max.toLocaleString('en-IN') : '0' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Submission Deadline</span>
+                  <span class="info-value">
+                    ⏱️ <%= new Date(project.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Domain Track</span>
+                  <span class="info-value"><%= project.category ? project.category.replace('_', ' ') : 'General' %></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bidding Tips Card -->
+            <div class="admin-section-card" style="border-color: rgba(99, 102, 241, 0.35); background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), var(--bg-secondary));">
+              <h3 class="panel-title" style="color: #a5b4fc;">💡 Tips for Submitting Proposals</h3>
+              <ul style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.7; padding-left: 1.25rem;">
+                <li>Provide realistic timeline estimates based on your academic schedule.</li>
+                <li>Highlight relevant past projects or coursework done at MBM University.</li>
+                <li>Proposals are reviewed directly by platform administrators and club coordinators.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

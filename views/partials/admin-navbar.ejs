@@ -1,0 +1,47 @@
+<header class="admin-topbar">
+  <div class="admin-topbar-left">
+    <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle sidebar menu">
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar"></span>
+    </button>
+    <a href="/admin/dashboard" class="admin-brand">
+      <div class="brand-logo-badge admin-brand-badge"><img src="/images/logo.jpg" alt="PHOENIX Logo"></div>
+      <div class="brand-text-group">
+        <span class="brand-title">PHOENIX</span>
+        <span class="brand-subtitle">Admin Control Panel</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="admin-topbar-right">
+    <a href="/portfolio" class="btn btn-outline btn-sm home-link-btn" target="_blank">
+      <span>🎨</span> Showcase
+    </a>
+
+    <a href="/" class="btn btn-outline btn-sm home-link-btn" target="_blank">
+      <span>🌐</span> Main Site
+    </a>
+
+    <a href="/notifications" class="nav-notif-bell" title="Activity Notifications">
+      🔔
+      <% if (typeof unreadNotifsCount !== 'undefined' && unreadNotifsCount > 0) { %>
+        <span class="notif-badge-count"><%= unreadNotifsCount %></span>
+      <% } %>
+    </a>
+
+    <% if (typeof user !== 'undefined' && user) { %>
+      <div class="admin-user-badge">
+        <span class="admin-avatar"><%= user.name ? user.name.charAt(0).toUpperCase() : 'A' %></span>
+        <div class="admin-user-info">
+          <span class="admin-user-name"><%= user.name %></span>
+          <span class="admin-user-role">Administrator</span>
+        </div>
+      </div>
+
+      <form action="/logout" method="POST" class="logout-form">
+        <button type="submit" class="btn btn-secondary btn-sm logout-btn">Logout</button>
+      </form>
+    <% } %>
+  </div>
+</header>

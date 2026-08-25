@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Proposal Details | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Top Bar -->
+        <div class="details-top-bar">
+          <a href="/freelancer/bids" class="btn btn-outline btn-sm">&larr; Back to My Bids</a>
+          <span class="status-badge status-badge-<%= bid.status ? bid.status.toLowerCase() : 'pending' %> status-badge-lg">
+            Proposal <%= bid.status %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Status Outcome Notice Banner -->
+        <% if (bid.status === 'ACCEPTED') { %>
+          <div class="alert alert-success" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="alert-content" style="align-items: flex-start;">
+              <span class="alert-icon" style="font-size: 1.5rem;">🎉</span>
+              <div>
+                <strong style="font-size: 1.125rem; display: block; margin-bottom: 0.25rem;">Congratulations! Your bid has been accepted.</strong>
+                <span>You have been officially assigned to this project. Check your active assignments to view milestones and project deliverables.</span>
+                <div style="margin-top: 1rem;">
+                  <a href="/freelancer/assignments" class="btn btn-success btn-sm">Go to My Assignments &rarr;</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } else if (bid.status === 'REJECTED') { %>
+          <div class="alert alert-error" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+            <div class="alert-content">
+              <span class="alert-icon">ℹ</span>
+              <div>
+                <strong>Your bid was not selected.</strong>
+                <span>Another proposal was accepted for this contract. Explore other open projects in the marketplace.</span>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="alert alert-info" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+            <div class="alert-content">
+              <span class="alert-icon">⏳</span>
+              <div>
+                <strong>Proposal Under Review.</strong>
+                <span>Your proposal is currently being reviewed by administrators. You will be notified once an assignment decision is made.</span>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Bid & Project Details Grid -->
+        <div class="details-grid-2">
+          <!-- Left Column: Proposal Details -->
+          <div class="details-column">
+            <div class="admin-section-card">
+              <h3 class="panel-title">My Submitted Proposal</h3>
+              <div class="info-list" style="margin-bottom: 1.5rem;">
+                <div class="info-item">
+                  <span class="info-label">Proposed Price</span>
+                  <span class="info-value mono-text" style="color: var(--accent-emerald); font-size: 1.25rem; font-weight: 800;">
+                    ₹<%= bid.amount ? bid.amount.toLocaleString('en-IN') : '0' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Estimated Delivery</span>
+                  <span class="info-value">⏱️ <%= bid.estimatedDays %> Days</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Submission Date</span>
+                  <span class="info-value"><%= new Date(bid.createdAt).toLocaleString('en-IN') %></span>
+                </div>
+              </div>
+
+              <div class="bio-block" style="margin-top: 0; padding-top: 1rem;">
+                <span class="info-label" style="display: block; margin-bottom: 0.5rem;">Cover Letter / Proposal:</span>
+                <p class="bio-text" style="white-space: pre-wrap; font-size: 0.9375rem; line-height: 1.7;"><%= bid.proposal %></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Project Reference -->
+          <div class="details-column">
+            <div class="admin-section-card">
+              <h3 class="panel-title">Target Project Summary</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Project Title</span>
+                  <span class="info-value">
+                    <strong>
+                      <a href="/freelancer/projects/<%= bid.projectId ? bid.projectId._id : '' %>" class="table-project-link">
+                        <%= bid.projectId ? bid.projectId.title : 'Project' %> &rarr;
+                      </a>
+                    </strong>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Client Budget</span>
+                  <span class="info-value mono-text">
+                    ₹<%= bid.projectId && bid.projectId.budget ? bid.projectId.budget.min.toLocaleString('en-IN') : '0' %> - ₹<%= bid.projectId && bid.projectId.budget ? bid.projectId.budget.max.toLocaleString('en-IN') : '0' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Project Deadline</span>
+                  <span class="info-value">
+                    ⏱️ <%= bid.projectId && bid.projectId.deadline ? new Date(bid.projectId.deadline).toLocaleDateString('en-IN') : 'N/A' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Project Status</span>
+                  <span class="info-value">
+                    <span class="status-badge status-badge-<%= bid.projectId && bid.projectId.status ? bid.projectId.status.toLowerCase() : 'open' %>">
+                      <%= bid.projectId ? bid.projectId.status : 'OPEN' %>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

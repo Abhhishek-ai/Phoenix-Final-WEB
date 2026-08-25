@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Submit Review | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Submit Performance Review & Rating</h1>
+            <p class="page-main-subtitle">Rate <%= assignment.freelancerId ? assignment.freelancerId.name : 'Student' %> on <%= assignment.projectId ? assignment.projectId.title : 'Project' %></p>
+          </div>
+          <div>
+            <a href="/admin/assignments/<%= assignment._id %>" class="btn btn-secondary btn-sm">&larr; Back to Workspace</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Form Card -->
+        <div class="admin-section-card form-card-max">
+          <form action="/admin/assignments/<%= assignment._id %>/review" method="POST" class="project-form">
+            <!-- Star Rating Picker -->
+            <div class="form-group">
+              <label class="form-label">Student Performance Rating (1–5 Stars) <span class="required">*</span></label>
+              <div class="star-rating-picker">
+                <% for (let i = 5; i >= 1; i--) { %>
+                  <input 
+                    type="radio" 
+                    id="star<%= i %>" 
+                    name="rating" 
+                    value="<%= i %>" 
+                    <%= existingReview && existingReview.rating === i ? 'checked' : (i === 5 && !existingReview ? 'checked' : '') %>
+                    required
+                  >
+                  <label for="star<%= i %>" title="<%= i %> Stars">★</label>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Review Feedback -->
+            <div class="form-group">
+              <label for="comment" class="form-label">Review Testimonial & Feedback <span class="required">*</span></label>
+              <textarea 
+                id="comment" 
+                name="comment" 
+                rows="5" 
+                class="form-control" 
+                placeholder="Detail the student's timeliness, code quality, communication, and milestone delivery..." 
+                required
+              ><%= existingReview ? existingReview.comment : '' %></textarea>
+            </div>
+
+            <div class="form-notice">
+              ⭐ <strong>Profile Impact:</strong> Submitting this rating automatically recalculates the student's aggregate rating score and completed project count.
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary btn-lg">
+                ★ Publish Performance Review
+              </button>
+              <a href="/admin/assignments/<%= assignment._id %>" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

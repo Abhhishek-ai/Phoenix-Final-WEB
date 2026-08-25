@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Submit Proposal | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Title -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Submit Project Proposal</h1>
+            <p class="page-main-subtitle">Apply for <%= project.title %> with your custom bid and timeline</p>
+          </div>
+          <div>
+            <a href="/freelancer/projects/<%= project._id %>" class="btn btn-secondary btn-sm">&larr; Back to Project Brief</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Project Reference Summary Card -->
+        <div class="profile-hero-card" style="margin-bottom: 1.5rem;">
+          <div>
+            <span class="domain-tag-sm"><%= project.category ? project.category.replace('_', ' ') : 'General' %></span>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #fff; margin: 0.35rem 0;"><%= project.title %></h2>
+            <p class="profile-hero-meta">
+              <span>Client Budget: <strong style="color: var(--accent-emerald);">₹<%= project.budget.min.toLocaleString('en-IN') %> - ₹<%= project.budget.max.toLocaleString('en-IN') %></strong></span>
+              <span>&bull;</span>
+              <span>Project Deadline: <strong><%= new Date(project.deadline).toLocaleDateString('en-IN') %></strong></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Bid Form Card -->
+        <div class="admin-section-card form-card-max">
+          <form action="/freelancer/projects/<%= project._id %>/bid" method="POST" class="project-form" novalidate>
+            <div class="form-grid-2">
+              <!-- Bid Amount -->
+              <div class="form-group">
+                <label for="amount" class="form-label">Your Bid Price (INR ₹) <span class="required">*</span></label>
+                <input 
+                  type="number" 
+                  id="amount" 
+                  name="amount" 
+                  class="form-control <%= typeof errors !== 'undefined' && errors.amount ? 'is-invalid' : '' %>" 
+                  placeholder="e.g. <%= project.budget.min %>" 
+                  value="<%= typeof formData !== 'undefined' && formData.amount ? formData.amount : '' %>" 
+                  min="1"
+                  required
+                >
+                <% if (typeof errors !== 'undefined' && errors.amount) { %>
+                  <span class="form-error"><%= errors.amount %></span>
+                <% } %>
+              </div>
+
+              <!-- Estimated Days -->
+              <div class="form-group">
+                <label for="estimatedDays" class="form-label">Estimated Delivery Days <span class="required">*</span></label>
+                <input 
+                  type="number" 
+                  id="estimatedDays" 
+                  name="estimatedDays" 
+                  class="form-control <%= typeof errors !== 'undefined' && errors.estimatedDays ? 'is-invalid' : '' %>" 
+                  placeholder="e.g. 7" 
+                  value="<%= typeof formData !== 'undefined' && formData.estimatedDays ? formData.estimatedDays : '' %>" 
+                  min="1"
+                  required
+                >
+                <% if (typeof errors !== 'undefined' && errors.estimatedDays) { %>
+                  <span class="form-error"><%= errors.estimatedDays %></span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Proposal Text -->
+            <div class="form-group">
+              <label for="proposal" class="form-label">Proposal Cover Letter & Technical Approach <span class="required">*</span></label>
+              <textarea 
+                id="proposal" 
+                name="proposal" 
+                rows="8" 
+                class="form-control <%= typeof errors !== 'undefined' && errors.proposal ? 'is-invalid' : '' %>" 
+                placeholder="Explain why you are the best fit for this project, the tech stack you'll employ, your availability, and previous relevant coursework/projects at MBM..." 
+                required
+              ><%= typeof formData !== 'undefined' && formData.proposal ? formData.proposal : '' %></textarea>
+              <% if (typeof errors !== 'undefined' && errors.proposal) { %>
+                <span class="form-error"><%= errors.proposal %></span>
+              <% } %>
+            </div>
+
+            <!-- Bidding Guidelines Notice -->
+            <div class="form-notice">
+              🛡️ <strong>MBM Honor Code:</strong> Submitting this bid commits you to delivering quality work within your proposed timeline upon administrator acceptance.
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary btn-lg">
+                🏷️ Submit Proposal & Bid
+              </button>
+              <a href="/freelancer/projects/<%= project._id %>" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

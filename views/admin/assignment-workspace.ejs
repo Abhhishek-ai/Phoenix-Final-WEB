@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Assignment Review | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Status Pill -->
+        <div class="details-top-bar">
+          <a href="/admin/assignments" class="btn btn-outline btn-sm">&larr; Back to Platform Assignments</a>
+          <span class="status-badge status-badge-<%= assignment.status ? assignment.status.toLowerCase() : 'assigned' %> status-badge-lg">
+            Status: <%= assignment.status.replace('_', ' ') %>
+          </span>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Hero Header -->
+        <div class="profile-hero-card">
+          <div>
+            <span class="domain-tag-sm" style="margin-bottom: 0.5rem; display: inline-block;">
+              <%= assignment.projectId && assignment.projectId.category ? assignment.projectId.category.replace('_', ' ') : 'General' %>
+            </span>
+            <h1 class="profile-hero-name"><%= assignment.projectId ? assignment.projectId.title : 'Project Assignment' %></h1>
+            <p class="profile-hero-meta">
+              <span>👤 Assigned Student: <strong><%= assignment.freelancerId ? assignment.freelancerId.name : 'Freelancer' %></strong> (<%= assignment.freelancerId ? assignment.freelancerId.email : '' %>)</span>
+              <span>&bull;</span>
+              <span>📅 Assigned Date: <%= new Date(assignment.startDate).toLocaleDateString('en-IN') %></span>
+            </p>
+          </div>
+
+          <div class="profile-action-controls">
+            <a href="/assignments/<%= assignment._id %>/chat" class="btn btn-secondary btn-md">
+              💬 Project Chat
+            </a>
+
+            <% if (assignment.status === 'COMPLETED') { %>
+              <a href="/admin/assignments/<%= assignment._id %>/review" class="btn btn-primary btn-md">
+                ⭐ Rate Student
+              </a>
+            <% } %>
+
+            <div style="text-align: right;">
+              <span class="info-label" style="display: block; font-size: 0.75rem;">Progress Telemetry</span>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+                <div class="progress-bar-container" style="width: 100px;">
+                  <div class="progress-bar-fill" style="width: <%= assignment.progress || 0 %>%;"></div>
+                </div>
+                <strong style="color: #fff;"><%= assignment.progress || 0 %>%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Workspace Layout -->
+        <div class="details-grid-2">
+          <!-- Left Column: Submission History & Review Controls -->
+          <div class="details-column">
+            <div class="admin-section-card">
+              <h3 class="panel-title">Student Deliverables & Version History</h3>
+
+              <% if (typeof deliverables !== 'undefined' && deliverables.length > 0) { %>
+                <div class="deliverables-timeline">
+                  <% deliverables.forEach(function(deliv) { %>
+                    <div class="deliverable-version-card <%= deliv.status === 'APPROVED' ? 'version-approved' : (deliv.status === 'REVISION_REQUIRED' ? 'version-revision' : '') %>">
+                      <div class="deliverable-version-header">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                          <span class="version-badge">Version <%= deliv.version %></span>
+                          <h4 class="deliverable-title"><%= deliv.title %></h4>
+                        </div>
+                        <span class="status-badge status-badge-<%= deliv.status ? deliv.status.toLowerCase() : 'submitted' %>">
+                          <%= deliv.status.replace('_', ' ') %>
+                        </span>
+                      </div>
+
+                      <% if (deliv.description) { %>
+                        <p class="deliverable-desc"><%= deliv.description %></p>
+                      <% } %>
+
+                      <!-- Attached Files for Download/Inspection -->
+                      <% if (deliv.files && deliv.files.length > 0) { %>
+                        <div class="attached-files-list">
+                          <% deliv.files.forEach(function(f) { %>
+                            <a href="<%= f.url %>" target="_blank" rel="noopener noreferrer" class="file-attachment-chip">
+                              <span class="file-chip-icon">
+                                <% if (f.originalName.endsWith('.zip')) { %>📦
+                                <% } else if (f.originalName.endsWith('.pdf')) { %>📄
+                                <% } else if (f.originalName.match(/\.(jpg|jpeg|png|webp)$/i)) { %>🖼️
+                                <% } else if (f.originalName.endsWith('.mp4')) { %>🎥
+                                <% } else { %>📎<% } %>
+                              </span>
+                              <span class="file-chip-name"><%= f.originalName %></span>
+                              <% if (f.size) { %>
+                                <span class="file-chip-size">(<%= (f.size / (1024 * 1024)).toFixed(1) %> MB)</span>
+                              <% } %>
+                              <span class="file-download-arrow">&darr;</span>
+                            </a>
+                          <% }); %>
+                        </div>
+                      <% } %>
+
+                      <!-- Previous Feedback Display -->
+                      <% if (deliv.reviewFeedback) { %>
+                        <div class="revision-feedback-box">
+                          <div class="feedback-header">
+                            <span>💬 Review Notes:</span>
+                            <% if (deliv.reviewedBy) { %>
+                              <span class="reviewer-name">Reviewed by <%= deliv.reviewedBy.name %></span>
+                            <% } %>
+                          </div>
+                          <p class="feedback-text"><%= deliv.reviewFeedback %></p>
+                        </div>
+                      <% } %>
+
+                      <!-- Admin Review Action Controls for this deliverable -->
+                      <% if (deliv.status === 'SUBMITTED' || deliv.status === 'UNDER_REVIEW') { %>
+                        <div class="admin-review-actions-panel">
+                          <form action="/admin/deliverables/<%= deliv._id %>/approve" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Approve this deliverable? This will mark the project and assignment as COMPLETED.')">
+                              ✓ Approve Submission & Mark Completed
+                            </button>
+                          </form>
+
+                          <!-- Revision Request Trigger Form -->
+                          <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                            <form action="/admin/deliverables/<%= deliv._id %>/revision" method="POST">
+                              <label class="form-label" style="font-size: 0.8125rem;">Request Revision / Changes:</label>
+                              <textarea 
+                                name="feedback" 
+                                rows="3" 
+                                class="form-control" 
+                                placeholder="Explain what changes or updates are needed from the student..." 
+                                required
+                              ></textarea>
+                              <div style="margin-top: 0.5rem;">
+                                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Request a revision for this deliverable?')">
+                                  ⚠️ Send Revision Request to Student
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      <% } else if (deliv.status === 'APPROVED') { %>
+                        <div class="accepted-badge-text" style="margin-top: 0.75rem;">
+                          ✓ Submission Approved & Finalized
+                        </div>
+                      <% } %>
+
+                      <div class="deliverable-footer-meta">
+                        <span>Submitted on <%= new Date(deliv.submittedAt).toLocaleString('en-IN') %></span>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              <% } else { %>
+                <div class="empty-state" style="padding: 2.5rem 1rem;">
+                  <span class="empty-state-icon">📦</span>
+                  <h3>No Deliverables Submitted Yet</h3>
+                  <p>The student freelancer has not uploaded any deliverable files for this assignment yet.</p>
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Right Column: Student & Project Specs -->
+          <div class="details-column">
+            <!-- Student Information Card -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Assigned Student Details</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Student Name</span>
+                  <span class="info-value">
+                    <strong>
+                      <a href="/admin/freelancers/<%= assignment.freelancerId ? assignment.freelancerId._id : '' %>" target="_blank" class="table-project-link">
+                        <%= assignment.freelancerId ? assignment.freelancerId.name : 'Unknown' %> &rarr;
+                      </a>
+                    </strong>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Email</span>
+                  <span class="info-value"><%= assignment.freelancerId ? assignment.freelancerId.email : '' %></span>
+                </div>
+                <% if (profile && profile.branch) { %>
+                  <div class="info-item">
+                    <span class="info-label">Branch & Year</span>
+                    <span class="info-value"><%= profile.branch %> (<%= profile.year %> Year)</span>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Project Specifications -->
+            <div class="admin-section-card">
+              <h3 class="panel-title">Assignment Specifications</h3>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Deadline</span>
+                  <span class="info-value">
+                    ⏱️ <%= deadlineDate ? new Date(deadlineDate).toLocaleDateString('en-IN') : 'N/A' %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Timeline Status</span>
+                  <span class="info-value">
+                    <% if (isOverdue && assignment.status !== 'COMPLETED') { %>
+                      <span class="status-badge status-badge-suspended">⚠️ OVERDUE</span>
+                    <% } else if (assignment.status === 'COMPLETED') { %>
+                      <span class="status-badge status-badge-active">✓ Completed</span>
+                    <% } else { %>
+                      <span class="status-badge status-badge-active"><%= daysRemaining %> Days Left</span>
+                    <% } %>
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Assigned By</span>
+                  <span class="info-value"><%= assignment.assignedBy ? assignment.assignedBy.name : 'Admin' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

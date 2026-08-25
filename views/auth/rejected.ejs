@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Registration Not Approved | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <div class="flash-container">
+    <%- include('../partials/flash') %>
+  </div>
+
+  <main class="auth-main">
+    <div class="auth-card status-card">
+      <div class="status-icon-wrapper status-rejected">
+        <span>❌</span>
+      </div>
+
+      <div class="auth-header">
+        <span class="status-pill status-pill-rejected">Status: Registration Not Approved</span>
+        <h1 class="auth-title">Registration Status</h1>
+        <p class="auth-subtitle">
+          Your PHOENIX student freelancer registration was not approved.
+        </p>
+      </div>
+
+      <div class="status-content-box">
+        <p class="status-text">
+          During the verification process, our coordinators were unable to validate the academic or student details provided. Only verified students of MBM University are eligible for platform freelancing tracks.
+        </p>
+        <p class="status-contact-note">
+          If you have questions regarding this decision, feel free to reach out to the club leadership.
+        </p>
+      </div>
+
+      <div class="status-actions">
+        <a href="mailto:phoenix@mbm.ac.in" class="btn btn-primary btn-lg">Contact Coordinators</a>
+        <a href="/" class="btn btn-secondary btn-lg">Back to Homepage</a>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

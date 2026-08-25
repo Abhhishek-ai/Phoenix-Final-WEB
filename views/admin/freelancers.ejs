@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Manage Freelancers | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Freelancer Directory</h1>
+            <p class="page-main-subtitle">Review, verify, and manage all MBM University student freelancer profiles</p>
+          </div>
+          <div>
+            <a href="/admin/dashboard" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="toolbar-card">
+          <!-- Status Filter Tabs -->
+          <div class="filter-tabs">
+            <a href="/admin/freelancers<%= typeof searchQuery !== 'undefined' && searchQuery ? '?q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab <%= typeof currentStatus !== 'undefined' && currentStatus === 'ALL' ? 'active' : '' %>">
+              All
+            </a>
+            <a href="/admin/freelancers?status=PENDING<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-pending <%= typeof currentStatus !== 'undefined' && currentStatus === 'PENDING' ? 'active' : '' %>">
+              Pending
+            </a>
+            <a href="/admin/freelancers?status=ACTIVE<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-active <%= typeof currentStatus !== 'undefined' && currentStatus === 'ACTIVE' ? 'active' : '' %>">
+              Active
+            </a>
+            <a href="/admin/freelancers?status=SUSPENDED<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-suspended <%= typeof currentStatus !== 'undefined' && currentStatus === 'SUSPENDED' ? 'active' : '' %>">
+              Suspended
+            </a>
+            <a href="/admin/freelancers?status=REJECTED<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-rejected <%= typeof currentStatus !== 'undefined' && currentStatus === 'REJECTED' ? 'active' : '' %>">
+              Rejected
+            </a>
+          </div>
+
+          <!-- Search Form -->
+          <form action="/admin/freelancers" method="GET" class="search-form">
+            <% if (typeof currentStatus !== 'undefined' && currentStatus !== 'ALL') { %>
+              <input type="hidden" name="status" value="<%= currentStatus %>">
+            <% } %>
+            <div class="search-input-group">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                name="q" 
+                class="search-control" 
+                placeholder="Search name, email, or enrollment #..." 
+                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+              >
+              <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                <a href="/admin/freelancers<%= typeof currentStatus !== 'undefined' && currentStatus !== 'ALL' ? '?status=' + currentStatus : '' %>" class="clear-search-btn" title="Clear search">&times;</a>
+              <% } %>
+              <button type="submit" class="btn btn-secondary btn-sm search-submit-btn">Search</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Freelancers Table -->
+        <div class="admin-section-card">
+          <% if (typeof freelancers !== 'undefined' && freelancers.length > 0) { %>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Branch</th>
+                    <th>Year</th>
+                    <th>Status</th>
+                    <th>Joined Date</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% freelancers.forEach(function(f) { %>
+                    <tr>
+                      <td>
+                        <div class="student-name-cell">
+                          <span class="table-avatar"><%= f.name ? f.name.charAt(0).toUpperCase() : 'S' %></span>
+                          <div>
+                            <span class="student-name"><%= f.name %></span>
+                            <span class="student-enrollment">
+                              <%= f.profile && f.profile.enrollmentNumber ? f.profile.enrollmentNumber : 'No Enrollment #' %>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="mono-text"><%= f.email %></span></td>
+                      <td><%= f.profile && f.profile.branch ? f.profile.branch : 'Not set' %></td>
+                      <td>
+                        <% if (f.profile && f.profile.year) { %>
+                          <%= f.profile.year %><% if (f.profile.year === 1) { %>st<% } else if (f.profile.year === 2) { %>nd<% } else if (f.profile.year === 3) { %>rd<% } else { %>th<% } %> Year
+                        <% } else { %>
+                          -
+                        <% } %>
+                      </td>
+                      <td>
+                        <span class="status-badge status-badge-<%= f.status ? f.status.toLowerCase() : 'pending' %>">
+                          <%= f.status %>
+                        </span>
+                      </td>
+                      <td><%= new Date(f.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                      <td class="text-right">
+                        <a href="/admin/freelancers/<%= f._id %>" class="btn btn-secondary btn-xs">
+                          Review Profile &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">🔍</span>
+              <h3>No Freelancers Found</h3>
+              <p>
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  No student records matched your search query "<%= searchQuery %>".
+                <% } else if (typeof currentStatus !== 'undefined' && currentStatus !== 'ALL') { %>
+                  There are currently no freelancers with status "<%= currentStatus %>".
+                <% } else { %>
+                  No student freelancers have registered yet.
+                <% } %>
+              </p>
+              <div style="margin-top: 1rem;">
+                <a href="/admin/freelancers" class="btn btn-outline btn-sm">Reset Filters</a>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

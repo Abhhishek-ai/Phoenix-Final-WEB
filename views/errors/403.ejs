@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : '403 - Forbidden | PHOENIX - MBM University' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-body">
+  <%- include('../partials/navbar') %>
+
+  <main class="auth-main">
+    <div class="auth-card status-card">
+      <div class="status-icon-wrapper status-rejected">
+        <span>🚫</span>
+      </div>
+
+      <div class="auth-header">
+        <span class="status-pill status-pill-rejected">HTTP 403 Forbidden</span>
+        <h1 class="auth-title">Access Denied</h1>
+        <p class="auth-subtitle">
+          <%= typeof message !== 'undefined' ? message : 'You do not have permission to access this resource.' %>
+        </p>
+      </div>
+
+      <div class="status-content-box">
+        <p class="status-text">
+          This area is restricted to specific role permissions within PHOENIX. Your current account role does not grant authorization to view this resource.
+        </p>
+      </div>
+
+      <div class="status-actions">
+        <a href="/" class="btn btn-primary btn-lg">Back to Homepage</a>
+        <% if (typeof user !== 'undefined' && user) { %>
+          <form action="/logout" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-secondary btn-lg">Log Out</button>
+          </form>
+        <% } else { %>
+          <a href="/login" class="btn btn-secondary btn-lg">Log In</a>
+        <% } %>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

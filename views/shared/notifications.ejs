@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Notifications | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <% if (typeof user !== 'undefined' && user && user.role === 'ADMIN') { %>
+    <%- include('../partials/admin-navbar') %>
+    <div class="dashboard-layout">
+      <%- include('../partials/admin-sidebar') %>
+      <main class="dashboard-content">
+  <% } else if (typeof user !== 'undefined' && user && user.role === 'FREELANCER') { %>
+    <%- include('../partials/freelancer-navbar') %>
+    <div class="dashboard-layout">
+      <%- include('../partials/freelancer-sidebar') %>
+      <main class="dashboard-content">
+  <% } else { %>
+    <%- include('../partials/navbar') %>
+    <main class="public-main-content">
+  <% } %>
+
+      <div class="dashboard-container" style="max-width: 800px; margin: 0 auto;">
+        <!-- Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Activity Notifications</h1>
+            <p class="page-main-subtitle">Real-time alerts, project updates, review decisions, and direct messages</p>
+          </div>
+          <div>
+            <form action="/notifications/read-all" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-secondary btn-sm">✓ Mark All as Read</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="admin-section-card">
+          <% if (typeof notifications !== 'undefined' && notifications.length > 0) { %>
+            <div class="notifications-feed">
+              <% notifications.forEach(function(n) { %>
+                <div class="notification-feed-item <%= !n.isRead ? 'notif-unread' : '' %>">
+                  <div class="notif-icon-col">
+                    <% if (n.type === 'BID_ACCEPTED' || n.type === 'WORK_APPROVED' || n.type === 'ACCOUNT_APPROVED') { %>
+                      <span class="notif-icon notif-success">🎉</span>
+                    <% } else if (n.type === 'REVISION_REQUESTED' || n.type === 'BID_REJECTED') { %>
+                      <span class="notif-icon notif-warning">⚠️</span>
+                    <% } else if (n.type === 'NEW_MESSAGE') { %>
+                      <span class="notif-icon notif-info">💬</span>
+                    <% } else if (n.type === 'NEW_REVIEW') { %>
+                      <span class="notif-icon notif-star">⭐</span>
+                    <% } else { %>
+                      <span class="notif-icon notif-default">🔔</span>
+                    <% } %>
+                  </div>
+
+                  <div class="notif-content-col">
+                    <div class="notif-title-row">
+                      <strong class="notif-title"><%= n.title %></strong>
+                      <span class="notif-time"><%= new Date(n.createdAt).toLocaleDateString('en-IN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) %></span>
+                    </div>
+                    <p class="notif-message"><%= n.message %></p>
+
+                    <div class="notif-action-row">
+                      <% if (n.link) { %>
+                        <form action="/notifications/<%= n._id %>/read" method="POST" style="display:inline;">
+                          <button type="submit" class="btn btn-outline btn-xs">View Details &rarr;</button>
+                        </form>
+                      <% } %>
+
+                      <% if (!n.isRead) { %>
+                        <form action="/notifications/<%= n._id %>/read" method="POST" style="display:inline;">
+                          <button type="submit" class="notif-mark-btn">Mark read</button>
+                        </form>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">🔔</span>
+              <h3>No Notifications Yet</h3>
+              <p>You're all caught up! Updates regarding your project proposals, assignments, and reviews will appear here.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+  <% if (typeof user !== 'undefined' && user && (user.role === 'ADMIN' || user.role === 'FREELANCER')) { %>
+      </main>
+    </div>
+  <% } else { %>
+    </main>
+  <% } %>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

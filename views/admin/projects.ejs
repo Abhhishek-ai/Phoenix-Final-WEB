@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Manage Projects | PHOENIX Admin' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Project Directory</h1>
+            <p class="page-main-subtitle">Create, monitor, review proposals, and assign student projects</p>
+          </div>
+          <div class="page-header-actions">
+            <a href="/admin/projects/create" class="btn btn-primary btn-sm">
+              + Create New Project
+            </a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Toolbar & Filter Tabs -->
+        <div class="toolbar-card">
+          <div class="filter-tabs">
+            <a href="/admin/projects<%= typeof searchQuery !== 'undefined' && searchQuery ? '?q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab <%= typeof currentStatus !== 'undefined' && currentStatus === 'ALL' ? 'active' : '' %>">
+              All
+            </a>
+            <a href="/admin/projects?status=OPEN<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-active <%= typeof currentStatus !== 'undefined' && currentStatus === 'OPEN' ? 'active' : '' %>">
+              Open
+            </a>
+            <a href="/admin/projects?status=ASSIGNED<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-pending <%= typeof currentStatus !== 'undefined' && currentStatus === 'ASSIGNED' ? 'active' : '' %>">
+              Assigned
+            </a>
+            <a href="/admin/projects?status=CANCELLED<%= typeof searchQuery !== 'undefined' && searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>" 
+               class="filter-tab tab-suspended <%= typeof currentStatus !== 'undefined' && currentStatus === 'CANCELLED' ? 'active' : '' %>">
+              Cancelled
+            </a>
+          </div>
+
+          <!-- Search & Sort Form -->
+          <form action="/admin/projects" method="GET" class="search-form">
+            <% if (typeof currentStatus !== 'undefined' && currentStatus !== 'ALL') { %>
+              <input type="hidden" name="status" value="<%= currentStatus %>">
+            <% } %>
+            <div class="search-input-group">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                name="q" 
+                class="search-control" 
+                placeholder="Search project title..." 
+                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+              >
+              <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                <a href="/admin/projects<%= typeof currentStatus !== 'undefined' && currentStatus !== 'ALL' ? '?status=' + currentStatus : '' %>" class="clear-search-btn" title="Clear search">&times;</a>
+              <% } %>
+              <button type="submit" class="btn btn-secondary btn-sm search-submit-btn">Search</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Projects Table -->
+        <div class="admin-section-card">
+          <% if (typeof projects !== 'undefined' && projects.length > 0) { %>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Project Title</th>
+                    <th>Domain</th>
+                    <th>Budget Range</th>
+                    <th>Deadline</th>
+                    <th>Proposals</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% projects.forEach(function(p) { %>
+                    <tr>
+                      <td>
+                        <a href="/admin/projects/<%= p._id %>" class="table-project-link">
+                          <strong><%= p.title %></strong>
+                        </a>
+                      </td>
+                      <td>
+                        <span class="domain-tag-sm">
+                          <%= p.category ? p.category.replace('_', ' ') : 'General' %>
+                        </span>
+                      </td>
+                      <td>
+                        <span class="mono-text">₹<%= p.budget && p.budget.min ? p.budget.min.toLocaleString('en-IN') : '0' %> - ₹<%= p.budget && p.budget.max ? p.budget.max.toLocaleString('en-IN') : '0' %></span>
+                      </td>
+                      <td><%= new Date(p.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                      <td>
+                        <a href="/admin/projects/<%= p._id %>/bids" class="bids-count-pill <%= p.totalBids > 0 ? 'has-bids' : '' %>">
+                          <%= p.totalBids || 0 %> <%= p.totalBids === 1 ? 'Bid' : 'Bids' %> &rarr;
+                        </a>
+                      </td>
+                      <td>
+                        <span class="status-badge status-badge-<%= p.status ? p.status.toLowerCase() : 'open' %>">
+                          <%= p.status %>
+                        </span>
+                      </td>
+                      <td>
+                        <% if (p.selectedBid && p.selectedBid.freelancerId) { %>
+                          <span class="assigned-freelancer-tag">
+                            👤 <%= p.selectedBid.freelancerId.name %>
+                          </span>
+                        <% } else { %>
+                          <span class="text-muted">-</span>
+                        <% } %>
+                      </td>
+                      <td class="text-right">
+                        <div class="table-action-btns">
+                          <a href="/admin/projects/<%= p._id %>" class="btn btn-secondary btn-xs">Manage</a>
+                          <a href="/admin/projects/<%= p._id %>/bids" class="btn btn-outline btn-xs">Bids (<%= p.totalBids || 0 %>)</a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <span class="empty-state-icon">💼</span>
+              <h3>No Projects Found</h3>
+              <p>
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  No projects match "<%= searchQuery %>".
+                <% } else { %>
+                  No projects in this category or status yet.
+                <% } %>
+              </p>
+              <div style="margin-top: 1rem;">
+                <a href="/admin/projects/create" class="btn btn-primary btn-sm">+ Create First Project</a>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

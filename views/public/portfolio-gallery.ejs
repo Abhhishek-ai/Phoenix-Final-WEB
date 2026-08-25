@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Student Portfolio Showcase | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <main class="public-main-content">
+    <div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+      <!-- Hero Header -->
+      <div class="text-center" style="max-width: 760px; margin: 0 auto 3rem;">
+        <span class="hero-badge">🎨 Student Innovation Showcase</span>
+        <h1 class="hero-title" style="font-size: 2.5rem; margin-top: 1rem;">Engineering & Creative Builds from MBM University</h1>
+        <p class="hero-description">Explore live web applications, AI systems, mobile apps, UI designs, and hardware projects built by verified student freelancers.</p>
+      </div>
+
+      <!-- Domain Category Filters -->
+      <div class="category-pills-scroll" style="justify-content: center; margin-bottom: 2.5rem;">
+        <a href="/portfolio" class="cat-pill <%= typeof currentCategory !== 'undefined' && currentCategory === 'ALL' ? 'active' : '' %>">
+          All Domains
+        </a>
+        <% if (typeof categories !== 'undefined') { %>
+          <% categories.forEach(function(cat) { %>
+            <a href="/portfolio?category=<%= cat %>" class="cat-pill <%= typeof currentCategory !== 'undefined' && currentCategory === cat ? 'active' : '' %>">
+              <%= cat.replace('_', ' ') %>
+            </a>
+          <% }); %>
+        <% } %>
+      </div>
+
+      <!-- Gallery Grid -->
+      <% if (typeof projects !== 'undefined' && projects.length > 0) { %>
+        <div class="portfolio-showcase-grid">
+          <% projects.forEach(function(item) { %>
+            <div class="portfolio-item-card">
+              <div class="portfolio-card-media">
+                <% if (item.media && item.media.length > 0 && item.media[0].url) { %>
+                  <img src="<%= item.media[0].url %>" alt="<%= item.title %>" class="portfolio-img">
+                <% } else { %>
+                  <div class="portfolio-placeholder-img">
+                    <span>🎨 Project Preview</span>
+                  </div>
+                <% } %>
+              </div>
+
+              <div class="portfolio-card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <span class="domain-tag-sm"><%= item.category ? item.category.replace('_', ' ') : 'General' %></span>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                    👤 <%= item.freelancerId ? item.freelancerId.name : 'MBM Student' %>
+                  </span>
+                </div>
+
+                <h3 class="portfolio-card-title"><%= item.title %></h3>
+                <p class="portfolio-card-desc"><%= item.description %></p>
+
+                <% if (item.skills && item.skills.length > 0) { %>
+                  <div class="skills-tag-group" style="margin: 0.75rem 0;">
+                    <% item.skills.forEach(function(s) { %>
+                      <span class="skill-tag skill-tag-sm">
+                        <%= typeof s === 'object' && s.name ? s.name : s %>
+                      </span>
+                    <% }); %>
+                  </div>
+                <% } %>
+
+                <div class="portfolio-links-row">
+                  <% if (item.projectLink) { %>
+                    <a href="<%= item.projectLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                      🌐 Live Demo ↗
+                    </a>
+                  <% } %>
+                  <% if (item.githubLink) { %>
+                    <a href="<%= item.githubLink %>" target="_blank" rel="noopener noreferrer" class="portfolio-outlink">
+                      💻 GitHub Code ↗
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="admin-section-card" style="max-width: 600px; margin: 0 auto;">
+          <div class="empty-state">
+            <span class="empty-state-icon">🎨</span>
+            <h3>No Showcase Projects Under This Category</h3>
+            <p>Students are currently building and publishing their work. Check back soon!</p>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <script src="/js/main.js"></script>
+</body>
+</html>

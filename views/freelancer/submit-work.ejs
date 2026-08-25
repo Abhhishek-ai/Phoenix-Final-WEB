@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Submit Deliverable | PHOENIX' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-body">
+  <%- include('../partials/freelancer-navbar') %>
+
+  <div class="dashboard-layout">
+    <%- include('../partials/freelancer-sidebar') %>
+
+    <main class="dashboard-content">
+      <div class="dashboard-container">
+        <!-- Back Navigation & Title -->
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-main-title">Submit Deliverables & Work</h1>
+            <p class="page-main-subtitle">Upload source code, documentation, designs, and media for <%= assignment.projectId ? assignment.projectId.title : 'Project' %></p>
+          </div>
+          <div>
+            <a href="/freelancer/assignments/<%= assignment._id %>" class="btn btn-secondary btn-sm">&larr; Back to Workspace</a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-flash-container">
+          <%- include('../partials/flash') %>
+        </div>
+
+        <!-- Version & Scope Reference Card -->
+        <div class="profile-hero-card" style="margin-bottom: 1.5rem;">
+          <div>
+            <span class="version-badge" style="font-size: 0.8125rem; margin-bottom: 0.5rem; display: inline-block;">
+              Submission: Version <%= nextVersion %>
+            </span>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #fff; margin: 0.25rem 0;"><%= assignment.projectId ? assignment.projectId.title : 'Assignment' %></h2>
+            <p class="profile-hero-meta">
+              <span>Delivery Deadline: <strong><%= assignment.deadline ? new Date(assignment.deadline).toLocaleDateString('en-IN') : 'N/A' %></strong></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Upload Form Card -->
+        <div class="admin-section-card form-card-max">
+          <form action="/freelancer/assignments/<%= assignment._id %>/submit" method="POST" enctype="multipart/form-data" class="project-form" novalidate>
+            <!-- Submission Title -->
+            <div class="form-group">
+              <label for="title" class="form-label">Submission Title <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                class="form-control" 
+                placeholder="e.g. Final Web Application Deliverable + Documentation v<%= nextVersion %>" 
+                value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : '' %>" 
+                required
+              >
+            </div>
+
+            <!-- Description / Release Notes -->
+            <div class="form-group">
+              <label for="description" class="form-label">Release Notes & Technical Overview</label>
+              <textarea 
+                id="description" 
+                name="description" 
+                rows="5" 
+                class="form-control" 
+                placeholder="Detail what is included in this submission, key features built, setup instructions, or how you addressed coordinator revision notes..."
+              ><%= typeof formData !== 'undefined' && formData.description ? formData.description : '' %></textarea>
+            </div>
+
+            <!-- File Upload Input (Multiple) -->
+            <div class="form-group">
+              <label for="files" class="form-label">Select Files to Upload (Up to 5 files, 100 MB max per file) <span class="required">*</span></label>
+              <div class="file-upload-dropzone">
+                <input 
+                  type="file" 
+                  id="files" 
+                  name="files" 
+                  class="file-input-control" 
+                  multiple 
+                  accept=".zip,.pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.mp4"
+                  required
+                >
+                <div class="dropzone-hint">
+                  <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">📁</span>
+                  <strong>Click to browse or drag and drop files</strong>
+                  <span class="allowed-types-text">Supported formats: ZIP, PDF, DOC, DOCX, PNG, JPG, WEBP, MP4</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Security & Honor Notice -->
+            <div class="form-notice">
+              🔒 <strong>Cloud Storage Security:</strong> Files will be securely streamed to Cloudinary and preserved in your submission version history.
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn btn-primary btn-lg">
+                🚀 Upload & Submit Version <%= nextVersion %>
+              </button>
+              <a href="/freelancer/assignments/<%= assignment._id %>" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
