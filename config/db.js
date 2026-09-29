@@ -16,7 +16,11 @@ const connectDB = async () => {
   const mongoURI = process.env.MONGO_URI;
 
   if (!mongoURI) {
-    console.error('[Database Error] MONGO_URI is not defined in environment variables.');
+    const errMsg = '[Database Error] MONGO_URI is not defined in environment variables.';
+    console.error(errMsg);
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      throw new Error(errMsg);
+    }
     process.exit(1);
   }
 
@@ -30,6 +34,9 @@ const connectDB = async () => {
     return conn;
   } catch (error) {
     console.error(`[Database Error] Failed to connect to MongoDB: ${error.message}`);
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      throw error;
+    }
     process.exit(1);
   }
 };
