@@ -64,6 +64,16 @@ connectDB()
     console.error('[DB Connection Error]:', err.message);
   });
 
+// Ensure DB is connected for every request (essential for serverless environments like Vercel)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // View Engine Setup (EJS)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
