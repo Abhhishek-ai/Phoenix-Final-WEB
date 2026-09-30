@@ -78,8 +78,11 @@ app.use(async (req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static Files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static Files (with HTTP caching for optimized performance)
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '7d' : '1h',
+  etag: true
+}));
 
 // Request Parsers
 app.use(express.json());
