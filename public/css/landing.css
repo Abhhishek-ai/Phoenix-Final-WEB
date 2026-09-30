@@ -1176,6 +1176,36 @@ button {
   background: linear-gradient(180deg, transparent 50%, var(--ph-bg-surface) 100%);
 }
 
+.ph-team-media-blank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.12), var(--ph-bg-surface));
+}
+
+.ph-team-blank-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--ph-text-subtle);
+  opacity: 0.6;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.ph-team-card:hover .ph-team-blank-avatar {
+  opacity: 1;
+  transform: scale(1.05);
+  color: var(--ph-accent-cyan);
+}
+
+.ph-blank-initials {
+  font-family: var(--ph-font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
 .ph-team-badge {
   position: absolute;
   top: 16px;
