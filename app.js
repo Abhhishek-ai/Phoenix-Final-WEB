@@ -64,14 +64,14 @@ connectDB()
     console.error('[DB Connection Error]:', err.message);
   });
 
-// Ensure DB is connected for every request (essential for serverless environments like Vercel)
+// Ensure DB connection is attempted non-blocking for every request
 app.use(async (req, res, next) => {
   try {
     await connectDB();
-    next();
   } catch (err) {
-    next(err);
+    // Non-blocking fallback
   }
+  next();
 });
 
 // View Engine Setup (EJS)

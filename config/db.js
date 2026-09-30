@@ -13,15 +13,11 @@ try {
  * MongoDB URI is loaded from process.env.MONGO_URI
  */
 const connectDB = async () => {
-  const mongoURI = process.env.MONGO_URI;
+  const mongoURI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
   if (!mongoURI) {
-    const errMsg = '[Database Error] MONGO_URI is not defined in environment variables.';
-    console.error(errMsg);
-    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-      throw new Error(errMsg);
-    }
-    process.exit(1);
+    console.warn('[Database] MONGO_URI is not defined. Running frontend-only mode without MongoDB.');
+    return null;
   }
 
   if (mongoose.connection.readyState === 1) {
@@ -33,11 +29,8 @@ const connectDB = async () => {
     console.log(`[Database] MongoDB Connected successfully to '${conn.connection.name}' at ${conn.connection.host}`);
     return conn;
   } catch (error) {
-    console.error(`[Database Error] Failed to connect to MongoDB: ${error.message}`);
-    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-      throw error;
-    }
-    process.exit(1);
+    console.warn(`[Database Warning] Failed to connect to MongoDB (${error.message}). Continuing in fallback mode.`);
+    return null;
   }
 };
 
